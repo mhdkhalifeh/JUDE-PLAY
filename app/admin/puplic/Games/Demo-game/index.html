@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #070914;
+      color: white;
+      font-family: Arial;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .game {
+      text-align: center;
+    }
+
+    button {
+      padding: 18px 35px;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(90deg, #7c3aed, #ec4899);
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>JUDE Play Demo Game</h1>
+    <p>Click the button to score!</p>
+    <h2 id="score">Score: 0</h2>
+    <button onclick="addScore()">Click Me</button>
+  </div>
+
+  <script>
+    let score = 0;
+
+    function addScore() {
+      score++;
+      document.getElementById("score").innerText = "Score: " + score;
+    }
+  </script>
+</body>
+</html>
