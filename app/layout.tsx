@@ -6,6 +6,8 @@ import Footer from "@/app/components/Footer";
 export const metadata: Metadata = {
   title: "JUDE Play",
   description: "Play the best online browser games instantly.",
+  manifest: "/manifest.json",
+themeColor: "#a855f7",
 };
 
 export default function RootLayout({
