@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import FavoriteButton from "@/app/components/FavoriteButton";
+import GameFrame from "@/app/components/GameFrame";
 
 async function getGame(slug: string) {
   const { data } = await supabase
@@ -29,13 +30,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
   const game = await getGame(slug);
 
   if (!game) {
-    return {
-      title: "Game Not Found | JUDE Play",
-    };
+    return { title: "Game Not Found | JUDE Play" };
   }
 
   return {
@@ -44,7 +42,6 @@ export async function generateMetadata({
       game.description ||
       game.meta ||
       `Play ${game.title} online on JUDE Play.`,
-
     openGraph: {
       title: `${game.title} | JUDE Play`,
       description:
@@ -74,14 +71,32 @@ async function saveRecentlyPlayed(slug: string) {
     game_slug: slug,
   });
 }
+const {
+  data: { user },
+} = await supabase.auth.getUser();
 
+if (user) {
+  const { data: existingAchievement } = await supabase
+    .from("achievements")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("title", "First Game")
+    .single();
+
+  if (!existingAchievement) {
+    await supabase.from("achievements").insert({
+      user_id: user.id,
+      title: "First Game",
+      description: "Played your first game on JUDE Play",
+    });
+  }
+}
 export default async function GamePage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-
   const game = await getGame(slug);
 
   if (!game) {
@@ -90,10 +105,7 @@ export default async function GamePage({
         <div className="mx-auto max-w-7xl p-8">
           <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
             <h1 className="text-4xl font-black">Game Not Found</h1>
-
-            <p className="mt-4 text-slate-400">
-              This game does not exist.
-            </p>
+            <p className="mt-4 text-slate-400">This game does not exist.</p>
 
             <Link
               href="/"
@@ -123,9 +135,7 @@ export default async function GamePage({
 
   await supabase
     .from("games")
-    .update({
-      plays: (game.plays || 0) + 1,
-    })
+    .update({ plays: (game.plays || 0) + 1 })
     .eq("slug", game.slug);
 
   await saveRecentlyPlayed(game.slug);
@@ -150,31 +160,9 @@ export default async function GamePage({
           </p>
         </div>
 
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black shadow-2xl shadow-fuchsia-500/10">
-          {game.game_url ? (
-            <iframe
-              src={game.game_url}
-              title={game.title}
-              className="h-[80vh] w-full border-0"
-              allowFullScreen
-            />
-          ) : (
-            <div className="flex h-[70vh] items-center justify-center bg-slate-950 text-slate-400">
-              No game URL added yet.
-            </div>
-          )}
-        </div>
+        <GameFrame gameUrl={game.game_url} title={game.title} />
 
         <div className="mt-5 flex flex-wrap gap-3">
-          <a
-            href={game.game_url || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-3 font-bold transition hover:scale-105"
-          >
-            🎮 Fullscreen
-          </a>
-
           <FavoriteButton gameSlug={game.slug} />
 
           <Link
