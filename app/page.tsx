@@ -208,7 +208,49 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+      <section className="mx-auto max-w-7xl px-8 pb-16">
+  <h2 className="text-4xl font-black">🏆 Leaderboard</h2>
 
+  <p className="mt-3 text-slate-400">
+    Top games ranked by players.
+  </p>
+
+  <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950">
+    {trendingGames.map((game, index) => (
+      <Link
+        key={game.id}
+        href={`/game/${game.slug}`}
+        className="flex items-center justify-between border-b border-white/5 p-6 transition hover:bg-white/5"
+      >
+        <div className="flex items-center gap-5">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-2xl font-black">
+            #{index + 1}
+          </div>
+
+          <div>
+            <h3 className="text-2xl font-black">
+              {game.title}
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-400">
+              {game.category}
+            </p>
+          </div>
+        </div>
+
+        <div className="text-right">
+          <p className="text-2xl font-black text-fuchsia-400">
+            {game.plays || 0}
+          </p>
+
+          <p className="text-sm text-slate-400">
+            plays
+          </p>
+        </div>
+      </Link>
+    ))}
+  </div>
+</section>
       {recentlyPlayed.length > 0 && (
         <section className="mx-auto max-w-7xl px-8 pb-16">
           <h2 className="text-4xl font-black">🕹 Recently Played</h2>
