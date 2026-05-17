@@ -80,7 +80,23 @@ export default async function GamePage({
 
   if (!game) {
   return (
-    ...
+    <main className="min-h-screen bg-[#050816] text-white">
+      <div className="mx-auto max-w-7xl p-8">
+        <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
+          <h1 className="text-4xl font-black">Game Not Found</h1>
+          <p className="mt-4 text-slate-400">
+            This game does not exist.
+          </p>
+
+          <Link
+            href="/"
+            className="mt-6 inline-block rounded-xl bg-fuchsia-600 px-5 py-3 font-bold"
+          >
+            Back Home
+          </Link>
+        </div>
+      </div>
+    </main>
   );
 }
 
