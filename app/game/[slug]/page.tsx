@@ -79,8 +79,29 @@ export default async function GamePage({
   const game = await getGame(slug);
 
   if (!game) {
-    return (
+  return (
+    ...
+  );
+}
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  name: game.title,
+  description: game.description || game.meta,
+  image: game.image,
+  url: `https://jude-play.vercel.app/game/${game.slug}`,
+  genre: game.category,
+  applicationCategory: "Game",
+  operatingSystem: "Web Browser",
+};
+
+const relatedGames = await getRelatedGames(game.category, game.slug);
       <main className="min-h-screen bg-[#050816] text-white">
+       <script
+  type="application/ld+json"
+  dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+/>
 
         <div className="mx-auto max-w-7xl p-8">
           <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
