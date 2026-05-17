@@ -187,6 +187,13 @@ export default function HomePage() {
             placeholder="Search for games..."
             className="mt-12 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-lg outline-none backdrop-blur focus:border-fuchsia-500"
           />
+          {query && (
+  <Link href={`/search/${encodeURIComponent(query)}`}>
+    <button className="mt-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-bold">
+      Search Page
+    </button>
+  </Link>
+)}
         </div>
       </section>
 
