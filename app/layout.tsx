@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   description: "Play the best online browser games instantly.",
   manifest: "/manifest.json",
 themeColor: "#a855f7",
+verification: {
+  google: "p374ZgarSEzrqSxEtYE9A52mynaz5nZaHCaxRHSP4oU",
+},
 };
 
 export default function RootLayout({
