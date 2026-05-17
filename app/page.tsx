@@ -94,6 +94,7 @@ export default function HomePage() {
           <div className="relative h-56 overflow-hidden">
             {game.image ? (
               <img
+              loading="lazy"
                 src={game.image}
                 alt={game.title}
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-110"

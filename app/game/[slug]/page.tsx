@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import FavoriteButton from "@/app/components/FavoriteButton";
 import GameFrame from "@/app/components/GameFrame";
+import AchievementTracker from "@/app/components/AchievementTracker";
 
 async function getGame(slug: string) {
   const { data } = await supabase
@@ -75,22 +76,7 @@ const {
   data: { user },
 } = await supabase.auth.getUser();
 
-if (user) {
-  const { data: existingAchievement } = await supabase
-    .from("achievements")
-    .select("*")
-    .eq("user_id", user.id)
-    .eq("title", "First Game")
-    .single();
 
-  if (!existingAchievement) {
-    await supabase.from("achievements").insert({
-      user_id: user.id,
-      title: "First Game",
-      description: "Played your first game on JUDE Play",
-    });
-  }
-}
 export default async function GamePage({
   params,
 }: {
@@ -102,6 +88,7 @@ export default async function GamePage({
   if (!game) {
     return (
       <main className="min-h-screen bg-[#050816] text-white">
+        <AchievementTracker />
         <div className="mx-auto max-w-7xl p-8">
           <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
             <h1 className="text-4xl font-black">Game Not Found</h1>

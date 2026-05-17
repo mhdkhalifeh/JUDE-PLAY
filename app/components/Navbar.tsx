@@ -32,6 +32,7 @@ export default function Navbar() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
         <Link href="/" className="group flex items-center">
           <img
+          loading="lazy"
             src="/logo.png"
             alt="JUDE PLAY"
             className="h-16 w-auto object-contain drop-shadow-[0_0_18px_rgba(168,85,247,0.9)] transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_30px_rgba(217,70,239,1)]"
