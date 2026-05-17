@@ -7,26 +7,34 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  async function signUp() {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+ async function signUp() {
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+  });
 
-    if (error) alert(error.message);
-    else alert("Account created successfully");
+  if (error) {
+    alert(error.message);
+    return;
   }
+
+  alert("Account created successfully");
+  window.location.href = "/profile";
+}
 
   async function login() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-    if (error) alert(error.message);
-    else alert("Logged in successfully");
+  if (error) {
+    alert(error.message);
+    return;
   }
 
+  window.location.href = "/profile";
+}
   return (
     <div className="min-h-screen bg-[#070914] p-8 text-white">
       <div className="mx-auto max-w-md rounded-3xl border border-white/10 bg-slate-950 p-8">

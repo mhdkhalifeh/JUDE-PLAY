@@ -38,20 +38,34 @@ export async function generateMetadata({
   }
 
   return {
+  title: `${game.title} | JUDE Play`,
+  description:
+    game.description ||
+    "Play the best HTML5 games instantly on JUDE Play.",
+
+  keywords: [
+    game.title,
+    game.category,
+    "HTML5 Games",
+    "Browser Games",
+    "Online Games",
+    "JUDE Play",
+  ],
+
+  openGraph: {
     title: `${game.title} | JUDE Play`,
-    description:
-      game.description ||
-      game.meta ||
-      `Play ${game.title} online on JUDE Play.`,
-    openGraph: {
-      title: `${game.title} | JUDE Play`,
-      description:
-        game.description ||
-        game.meta ||
-        `Play ${game.title} online on JUDE Play.`,
-      images: game.image ? [game.image] : [],
-    },
-  };
+    description: game.description,
+    images: [game.image],
+    type: "website",
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: `${game.title} | JUDE Play`,
+    description: game.description,
+    images: [game.image],
+  },
+};
 }
 
 async function saveRecentlyPlayed(slug: string) {
@@ -203,6 +217,7 @@ export default async function GamePage({
                   className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
                 >
                   <img
+                  loading="lazy"
                     src={relatedGame.image}
                     alt={relatedGame.title}
                     className="h-52 w-full object-cover"

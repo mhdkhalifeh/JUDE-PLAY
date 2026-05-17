@@ -1,17 +1,17 @@
+"use client";
+
 import Link from "next/link";
 
-export default function NotFound() {
+export default function ErrorPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050816] p-8 text-white">
       <div className="max-w-xl rounded-3xl border border-white/10 bg-slate-950 p-10 text-center">
-        <h1 className="text-6xl font-black text-fuchsia-500">404</h1>
-
-        <h2 className="mt-4 text-3xl font-black">
-          Page Not Found
-        </h2>
+        <h1 className="text-5xl font-black text-red-500">
+          Something Went Wrong
+        </h1>
 
         <p className="mt-4 text-slate-400">
-          The page you are looking for does not exist.
+          An unexpected error occurred.
         </p>
 
         <Link
