@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import FavoriteButton from "@/app/components/FavoriteButton";
+
 async function getGame(slug: string) {
   const { data } = await supabase
     .from("games")
@@ -21,6 +22,7 @@ async function getRelatedGames(category: string, slug: string) {
 
   return data || [];
 }
+
 export async function generateMetadata({
   params,
 }: {
@@ -28,11 +30,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
 
-  const { data: game } = await supabase
-    .from("games")
-    .select("*")
-    .eq("slug", slug)
-    .single();
+  const game = await getGame(slug);
 
   if (!game) {
     return {
@@ -44,15 +42,20 @@ export async function generateMetadata({
     title: `${game.title} | JUDE Play`,
     description:
       game.description ||
-      "Play the best HTML5 games instantly on JUDE Play.",
+      game.meta ||
+      `Play ${game.title} online on JUDE Play.`,
 
     openGraph: {
       title: `${game.title} | JUDE Play`,
-      description: game.description,
-      images: [game.image],
+      description:
+        game.description ||
+        game.meta ||
+        `Play ${game.title} online on JUDE Play.`,
+      images: game.image ? [game.image] : [],
     },
   };
 }
+
 async function saveRecentlyPlayed(slug: string) {
   const {
     data: { user },
@@ -60,7 +63,9 @@ async function saveRecentlyPlayed(slug: string) {
 
   if (!user) return;
 
-  await supabase.from("recently_played").delete()
+  await supabase
+    .from("recently_played")
+    .delete()
     .eq("user_id", user.id)
     .eq("game_slug", slug);
 
@@ -69,6 +74,7 @@ async function saveRecentlyPlayed(slug: string) {
     game_slug: slug,
   });
 }
+
 export default async function GamePage({
   params,
 }: {
@@ -79,49 +85,12 @@ export default async function GamePage({
   const game = await getGame(slug);
 
   if (!game) {
-  return (
-    <main className="min-h-screen bg-[#050816] text-white">
-      <div className="mx-auto max-w-7xl p-8">
-        <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
-          <h1 className="text-4xl font-black">Game Not Found</h1>
-          <p className="mt-4 text-slate-400">
-            This game does not exist.
-          </p>
-
-          <Link
-            href="/"
-            className="mt-6 inline-block rounded-xl bg-fuchsia-600 px-5 py-3 font-bold"
-          >
-            Back Home
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
-}
-
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "VideoGame",
-  name: game.title,
-  description: game.description || game.meta,
-  image: game.image,
-  url: `https://jude-play.vercel.app/game/${game.slug}`,
-  genre: game.category,
-  applicationCategory: "Game",
-  operatingSystem: "Web Browser",
-};
-
-const relatedGames = await getRelatedGames(game.category, game.slug);
+    return (
       <main className="min-h-screen bg-[#050816] text-white">
-       <script
-  type="application/ld+json"
-  dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-/>
-
         <div className="mx-auto max-w-7xl p-8">
           <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
             <h1 className="text-4xl font-black">Game Not Found</h1>
+
             <p className="mt-4 text-slate-400">
               This game does not exist.
             </p>
@@ -138,6 +107,18 @@ const relatedGames = await getRelatedGames(game.category, game.slug);
     );
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "VideoGame",
+    name: game.title,
+    description: game.description || game.meta,
+    image: game.image,
+    url: `https://jude-play.vercel.app/game/${game.slug}`,
+    genre: game.category,
+    applicationCategory: "Game",
+    operatingSystem: "Web Browser",
+  };
+
   const relatedGames = await getRelatedGames(game.category, game.slug);
 
   await supabase
@@ -147,8 +128,14 @@ const relatedGames = await getRelatedGames(game.category, game.slug);
     })
     .eq("slug", game.slug);
 
+  await saveRecentlyPlayed(game.slug);
+
   return (
     <main className="min-h-screen bg-[#050816] text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <div className="mx-auto max-w-7xl p-6 md:p-8">
         <div className="mb-8">
@@ -156,9 +143,7 @@ const relatedGames = await getRelatedGames(game.category, game.slug);
             {game.category}
           </p>
 
-          <h1 className="text-4xl font-black md:text-5xl">
-            {game.title}
-          </h1>
+          <h1 className="text-4xl font-black md:text-5xl">{game.title}</h1>
 
           <p className="mt-4 max-w-3xl text-slate-300">
             {game.description}
@@ -233,9 +218,7 @@ const relatedGames = await getRelatedGames(game.category, game.slug);
 
         {relatedGames.length > 0 && (
           <section className="mt-10">
-            <h2 className="mb-6 text-3xl font-black">
-              Related Games
-            </h2>
+            <h2 className="mb-6 text-3xl font-black">Related Games</h2>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {relatedGames.map((relatedGame: any) => (
