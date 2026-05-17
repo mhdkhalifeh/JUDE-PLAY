@@ -120,9 +120,13 @@ export default function HomePage() {
             </p>
 
             <div className="mt-6 flex items-center justify-between">
-              <span className="rounded-full bg-violet-600/20 px-4 py-2 text-sm text-violet-300">
-                {game.category}
-              </span>
+              <Link
+                 href={`/category/${encodeURIComponent(game.category)}`}
+                 className="rounded-full bg-violet-600/20 px-4 py-2 text-sm text-violet-300 transition hover:bg-violet-600/40">
+                 {game.category}
+                  </Link>
+                
+              
 
               <span className="text-sm text-yellow-400">
                 ⭐ {game.rating || "5.0"}
