@@ -182,6 +182,7 @@ export default function ProfilePage() {
                   <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-2">
                     {game.image ? (
                       <img
+                      loading="lazy"
                         src={game.image}
                         alt={game.title}
                         className="h-52 w-full object-cover"

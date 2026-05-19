@@ -345,6 +345,7 @@ setUser(user);
             >
               {game.image ? (
                 <img
+                loading="lazy"
                   src={game.image}
                   alt={game.title}
                   className="h-48 w-full object-cover"

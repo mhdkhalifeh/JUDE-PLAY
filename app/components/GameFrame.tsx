@@ -37,6 +37,7 @@ export default function GameFrame({
           className="h-[70vh] w-full border-0 md:h-[80vh]"
           allowFullScreen
           allow="fullscreen; gamepad; autoplay"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         />
       </div>
 

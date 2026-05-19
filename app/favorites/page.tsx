@@ -73,6 +73,7 @@ export default function FavoritesPage() {
               <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl transition hover:-translate-y-2">
                 {game.image ? (
                   <img
+                  loading="lazy"
                     src={game.image}
                     alt={game.title}
                     className="h-56 w-full object-cover"
