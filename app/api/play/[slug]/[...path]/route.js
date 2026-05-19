@@ -13,17 +13,21 @@ function getContentType(filePath) {
   if (filePath.endsWith(".js")) return "application/javascript";
   if (filePath.endsWith(".css")) return "text/css";
   if (filePath.endsWith(".png")) return "image/png";
-  if (filePath.endsWith(".jpg")) return "image/jpeg";
-  if (filePath.endsWith(".jpeg")) return "image/jpeg";
+  if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg")) return "image/jpeg";
   if (filePath.endsWith(".svg")) return "image/svg+xml";
-
+  if (filePath.endsWith(".json")) return "application/json";
+  if (filePath.endsWith(".mp3")) return "audio/mpeg";
+  if (filePath.endsWith(".wav")) return "audio/wav";
   return "application/octet-stream";
 }
 
-export async function GET(request, { params }) {
-  const { slug, path } = params;
+export async function GET(request, context) {
+  const params = await context.params;
 
-  const filePath = path.join("/");
+  const slug = params.slug;
+  const pathArray = params.path || params["...path"] || [];
+
+  const filePath = pathArray.join("/");
   const storagePath = `${slug}/${filePath}`;
 
   const { data, error } = await supabaseAdmin.storage
@@ -31,9 +35,7 @@ export async function GET(request, { params }) {
     .download(storagePath);
 
   if (error || !data) {
-    return new NextResponse("File not found", {
-      status: 404,
-    });
+    return new NextResponse("File not found", { status: 404 });
   }
 
   return new NextResponse(data, {
