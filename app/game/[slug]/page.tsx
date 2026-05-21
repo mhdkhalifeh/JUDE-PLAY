@@ -25,49 +25,6 @@ async function getRelatedGames(category: string, slug: string) {
   return data || [];
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const game = await getGame(slug);
-
-  if (!game) {
-    return { title: "Game Not Found | JUDE Play" };
-  }
-
-  return {
-  title: `${game.title} | JUDE Play`,
-  description:
-    game.description ||
-    "Play the best HTML5 games instantly on JUDE Play.",
-
-  keywords: [
-    game.title,
-    game.category,
-    "HTML5 Games",
-    "Browser Games",
-    "Online Games",
-    "JUDE Play",
-  ],
-
-  openGraph: {
-    title: `${game.title} | JUDE Play`,
-    description: game.description,
-    images: [game.image],
-    type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: `${game.title} | JUDE Play`,
-    description: game.description,
-    images: [game.image],
-  },
-};
-}
-
 async function saveRecentlyPlayed(slug: string) {
   const {
     data: { user },
@@ -86,10 +43,69 @@ async function saveRecentlyPlayed(slug: string) {
     game_slug: slug,
   });
 }
-const {
-  data: { user },
-} = await supabase.auth.getUser();
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const game = await getGame(slug);
+
+  if (!game) {
+    return {
+      title: "Game Not Found | JUDE Play",
+      description: "This game does not exist on JUDE Play.",
+    };
+  }
+
+  const description =
+    game.description ||
+    game.meta ||
+    `Play ${game.title} online for free on JUDE Play.`;
+
+  const image = game.image || "/logo.png";
+
+  return {
+    title: `${game.title} | Play Online Free | JUDE Play`,
+    description,
+    keywords: [
+      game.title,
+      game.category,
+      game.meta,
+      "HTML5 Games",
+      "WebGL Games",
+      "Browser Games",
+      "Online Games",
+      "Free Games",
+      "Play Online",
+      "JUDE Play",
+    ].filter(Boolean),
+
+    openGraph: {
+      title: `${game.title} | JUDE Play`,
+      description,
+      url: `https://jude-play.vercel.app/game/${game.slug}`,
+      siteName: "JUDE Play",
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: game.title,
+        },
+      ],
+      type: "website",
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `${game.title} | JUDE Play`,
+      description,
+      images: [image],
+    },
+  };
+}
 
 export default async function GamePage({
   params,
@@ -98,19 +114,10 @@ export default async function GamePage({
 }) {
   const { slug } = await params;
   const game = await getGame(slug);
-  if (game) {
-  await supabase
-    .from("games")
-    .update({
-      plays: (game.plays || 0) + 1,
-    })
-    .eq("id", game.id);
-}
 
   if (!game) {
     return (
       <main className="min-h-screen bg-[#050816] text-white">
-        <AchievementTracker />
         <div className="mx-auto max-w-7xl p-8">
           <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
             <h1 className="text-4xl font-black">Game Not Found</h1>
@@ -128,6 +135,13 @@ export default async function GamePage({
     );
   }
 
+  await supabase
+    .from("games")
+    .update({ plays: (game.plays || 0) + 1 })
+    .eq("id", game.id);
+
+  await saveRecentlyPlayed(game.slug);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoGame",
@@ -138,19 +152,19 @@ export default async function GamePage({
     genre: game.category,
     applicationCategory: "Game",
     operatingSystem: "Web Browser",
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "USD",
+    },
   };
 
   const relatedGames = await getRelatedGames(game.category, game.slug);
 
-  await supabase
-    .from("games")
-    .update({ plays: (game.plays || 0) + 1 })
-    .eq("slug", game.slug);
-
-  await saveRecentlyPlayed(game.slug);
-
   return (
     <main className="min-h-screen bg-[#050816] text-white">
+      <AchievementTracker />
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -165,15 +179,15 @@ export default async function GamePage({
           <h1 className="text-4xl font-black md:text-5xl">{game.title}</h1>
 
           <p className="mt-4 max-w-3xl text-slate-300">
-            {game.description}
+            {game.description || game.meta}
           </p>
         </div>
 
         <GameFrame
-  gameUrl={game.game_url}
-  title={game.title}
-  gameType={game.game_type || "local"}
-/>
+          gameUrl={game.game_url}
+          title={game.title}
+          gameType={game.game_type || "local"}
+        />
 
         <div className="mt-5 flex flex-wrap gap-3">
           <FavoriteButton gameSlug={game.slug} />
@@ -228,12 +242,18 @@ export default async function GamePage({
                   href={`/game/${relatedGame.slug}`}
                   className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
                 >
-                  <img
-                  loading="lazy"
-                    src={relatedGame.image}
-                    alt={relatedGame.title}
-                    className="h-52 w-full object-cover"
-                  />
+                  {relatedGame.image ? (
+                    <img
+                      loading="lazy"
+                      src={relatedGame.image}
+                      alt={relatedGame.title}
+                      className="h-52 w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-52 items-center justify-center bg-slate-900 text-slate-500">
+                      No Image
+                    </div>
+                  )}
 
                   <div className="p-4">
                     <h3 className="line-clamp-1 text-xl font-black">
