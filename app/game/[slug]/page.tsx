@@ -98,6 +98,14 @@ export default async function GamePage({
 }) {
   const { slug } = await params;
   const game = await getGame(slug);
+  if (game) {
+  await supabase
+    .from("games")
+    .update({
+      plays: (game.plays || 0) + 1,
+    })
+    .eq("id", game.id);
+}
 
   if (!game) {
     return (
