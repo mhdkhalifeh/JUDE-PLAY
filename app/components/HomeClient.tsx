@@ -61,7 +61,7 @@ export default function HomeClient({
 
     loadUserData();
   }, []);
-  
+
   async function toggleFavorite(gameSlug: string) {
     const {
       data: { user },
@@ -307,13 +307,8 @@ export default function HomeClient({
             </p>
           </div>
 
-          {loading && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-              Loading games...
-            </div>
-          )}
 
-          {!loading && games.length === 0 && (
+          {games.length === 0 && (
             <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
               No games found yet. Add your first game from Admin Dashboard.
             </div>
