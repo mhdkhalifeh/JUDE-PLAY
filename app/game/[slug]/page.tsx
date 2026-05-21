@@ -161,7 +161,11 @@ export default async function GamePage({
           </p>
         </div>
 
-        <GameFrame gameUrl={game.game_url} title={game.title} />
+        <GameFrame
+  gameUrl={game.game_url}
+  title={game.title}
+  gameType={game.game_type || "local"}
+/>
 
         <div className="mt-5 flex flex-wrap gap-3">
           <FavoriteButton gameSlug={game.slug} />

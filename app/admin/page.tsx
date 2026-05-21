@@ -321,7 +321,16 @@ setUser(user);
               </p>
             )}
           </div>
-
+<button
+  onClick={async () => {
+    const res = await fetch("/api/import-games");
+    const data = await res.json();
+    alert(data.message);
+  }}
+  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-white"
+>
+  Import Games
+</button>
           <button className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-black md:col-span-2">
             {editingSlug ? "Update Game" : "Add Game"}
           </button>
