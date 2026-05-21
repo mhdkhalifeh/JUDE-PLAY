@@ -44,9 +44,7 @@ export default function HomePage() {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (!error && data) {
-        setGames(data);
-      }
+      if (!error && data) setGames(data);
 
       const recentGames = await getRecentlyPlayed();
       setRecentlyPlayed(recentGames);
@@ -77,7 +75,7 @@ export default function HomePage() {
 
   const trendingGames = [...games]
     .sort((a, b) => (b.plays || 0) - (a.plays || 0))
-    .slice(0, 4);
+    .slice(0, 5);
 
   const newGames = [...games]
     .sort(
@@ -85,16 +83,16 @@ export default function HomePage() {
         new Date(b.created_at).getTime() -
         new Date(a.created_at).getTime()
     )
-    .slice(0, 4);
+    .slice(0, 5);
 
   function GameCard({ game }: { game: any }) {
     return (
-      <Link key={game.id} href={`/game/${game.slug}`}>
+      <Link href={`/game/${game.slug}`}>
         <div className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_40px_rgba(124,58,237,.35)]">
           <div className="relative h-56 overflow-hidden">
             {game.image ? (
               <img
-              loading="lazy"
+                loading="lazy"
                 src={game.image}
                 alt={game.title}
                 className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
@@ -115,18 +113,14 @@ export default function HomePage() {
           <div className="p-6">
             <h3 className="text-2xl font-black">{game.title}</h3>
 
-            <p className="mt-3 text-sm text-slate-400">
+            <p className="mt-3 line-clamp-2 text-sm text-slate-400">
               {game.meta || game.description || ""}
             </p>
 
             <div className="mt-6 flex items-center justify-between">
-              <Link
-                 href={`/category/${encodeURIComponent(game.category)}`}
-                 className="rounded-full bg-violet-600/20 px-4 py-2 text-sm text-violet-300 transition hover:bg-violet-600/40">
-                 {game.category}
-                  </Link>
-                
-              
+              <span className="rounded-full bg-violet-600/20 px-4 py-2 text-sm text-violet-300">
+                {game.category || "Arcade"}
+              </span>
 
               <span className="text-sm text-yellow-400">
                 ⭐ {game.rating || "5.0"}
@@ -151,12 +145,12 @@ export default function HomePage() {
 
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-8 py-28">
+        <div className="relative z-10 mx-auto max-w-7xl px-8 py-24">
           <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
             JUDE PLAY
           </p>
 
-          <h1 className="mt-6 max-w-3xl text-6xl font-black leading-tight">
+          <h1 className="mt-6 max-w-3xl text-5xl font-black leading-tight md:text-6xl">
             The Future Of Browser Gaming
           </h1>
 
@@ -187,82 +181,137 @@ export default function HomePage() {
             placeholder="Search for games..."
             className="mt-12 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-lg outline-none backdrop-blur focus:border-fuchsia-500"
           />
+
           {query && (
-  <Link href={`/search/${encodeURIComponent(query)}`}>
-    <button className="mt-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-bold">
-      Search Page
-    </button>
-  </Link>
-)}
+            <Link href={`/search/${encodeURIComponent(query)}`}>
+              <button className="mt-4 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-bold">
+                Open Search Page
+              </button>
+            </Link>
+          )}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-8 py-16">
-        <h2 className="text-4xl font-black">🔥 Most Played</h2>
-        <p className="mt-3 text-slate-400">
-          The most popular games on JUDE Play.
-        </p>
+      <section className="mx-auto grid max-w-7xl gap-8 px-8 py-16 lg:grid-cols-[280px_1fr]">
+        <aside className="hidden lg:block">
+          <div className="sticky top-24 space-y-6">
+            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
+              <h2 className="text-xl font-black">🔥 Most Played</h2>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {trendingGames.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
-      </section>
+              <div className="mt-4 space-y-3">
+                {trendingGames.map((game, index) => (
+                  <Link
+                    key={game.id}
+                    href={`/game/${game.slug}`}
+                    className="block rounded-xl bg-white/5 p-3 text-sm hover:bg-white/10"
+                  >
+                    #{index + 1} {game.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
-      <section className="mx-auto max-w-7xl px-8 pb-16">
-        <h2 className="text-4xl font-black">🆕 New Games</h2>
-        <p className="mt-3 text-slate-400">Freshly added games.</p>
+            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
+              <h2 className="text-xl font-black">🆕 New Games</h2>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {newGames.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </div>
-      </section>
-      <section className="mx-auto max-w-7xl px-8 pb-16">
-  <h2 className="text-4xl font-black">🏆 Leaderboard</h2>
+              <div className="mt-4 space-y-3">
+                {newGames.map((game) => (
+                  <Link
+                    key={game.id}
+                    href={`/game/${game.slug}`}
+                    className="block rounded-xl bg-white/5 p-3 text-sm hover:bg-white/10"
+                  >
+                    {game.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
 
-  <p className="mt-3 text-slate-400">
-    Top games ranked by players.
-  </p>
+            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
+              <h2 className="text-xl font-black">🏆 Leaderboard</h2>
 
-  <div className="mt-10 overflow-hidden rounded-3xl border border-white/10 bg-slate-950">
-    {trendingGames.map((game, index) => (
-      <Link
-        key={game.id}
-        href={`/game/${game.slug}`}
-        className="flex items-center justify-between border-b border-white/5 p-6 transition hover:bg-white/5"
-      >
-        <div className="flex items-center gap-5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 text-2xl font-black">
-            #{index + 1}
+              <div className="mt-4 space-y-3">
+                {trendingGames.map((game, index) => (
+                  <div
+                    key={game.id}
+                    className="flex items-center justify-between rounded-xl bg-white/5 p-3 text-sm"
+                  >
+                    <span>
+                      #{index + 1} {game.title}
+                    </span>
+                    <span className="text-fuchsia-400">
+                      {game.plays || 0}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
+        </aside>
 
-          <div>
-            <h3 className="text-2xl font-black">
-              {game.title}
-            </h3>
+        <div id="games">
+          <div className="mb-8">
+            <h2 className="text-4xl font-black">
+              {query || selectedCategory !== "All"
+                ? "Filtered Games"
+                : "All Games"}
+            </h2>
 
-            <p className="mt-1 text-sm text-slate-400">
-              {game.category}
+            <p className="mt-3 text-slate-400">
+              {query
+                ? `Showing results for "${query}"`
+                : selectedCategory !== "All"
+                ? `Showing ${selectedCategory} games`
+                : "Discover the hottest games on JUDE Play"}
             </p>
           </div>
-        </div>
 
-        <div className="text-right">
-          <p className="text-2xl font-black text-fuchsia-400">
-            {game.plays || 0}
-          </p>
+          {loading && (
+            <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
+              Loading games...
+            </div>
+          )}
 
-          <p className="text-sm text-slate-400">
-            plays
-          </p>
+          {!loading && games.length === 0 && (
+            <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
+              No games found yet. Add your first game from Admin Dashboard.
+            </div>
+          )}
+
+          {games.length > 0 && (
+            <>
+              <div className="mb-10 flex flex-wrap gap-3">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`rounded-full px-5 py-3 text-sm font-bold transition ${
+                      selectedCategory === category
+                        ? "bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_0_24px_rgba(168,85,247,.35)]"
+                        : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                {filteredGames.map((game) => (
+                  <GameCard key={game.id} game={game} />
+                ))}
+              </div>
+
+              {filteredGames.length === 0 && (
+                <div className="mt-10 rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
+                  No games found.
+                </div>
+              )}
+            </>
+          )}
         </div>
-      </Link>
-    ))}
-  </div>
-</section>
+      </section>
+
       {recentlyPlayed.length > 0 && (
         <section className="mx-auto max-w-7xl px-8 pb-16">
           <h2 className="text-4xl font-black">🕹 Recently Played</h2>
@@ -275,66 +324,6 @@ export default function HomePage() {
           </div>
         </section>
       )}
-
-      <section id="games" className="mx-auto max-w-7xl px-8 py-16">
-        <div className="mb-8">
-          <h2 className="text-4xl font-black">
-            {query || selectedCategory !== "All" ? "Filtered Games" : "All Games"}
-          </h2>
-
-          <p className="mt-3 text-slate-400">
-            {query
-              ? `Showing results for "${query}"`
-              : selectedCategory !== "All"
-              ? `Showing ${selectedCategory} games`
-              : "Discover the hottest games on JUDE Play"}
-          </p>
-        </div>
-
-        {loading && (
-          <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-            Loading games...
-          </div>
-        )}
-
-        {!loading && games.length === 0 && (
-          <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-            No games found yet. Add your first game from Admin Dashboard.
-          </div>
-        )}
-
-        {games.length > 0 && (
-          <>
-            <div className="mb-10 flex flex-wrap gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`rounded-full px-5 py-3 text-sm font-bold transition ${
-                    selectedCategory === category
-                      ? "bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_0_24px_rgba(168,85,247,.35)]"
-                      : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              {filteredGames.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
-
-            {filteredGames.length === 0 && (
-              <div className="mt-10 rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-                No games found.
-              </div>
-            )}
-          </>
-        )}
-      </section>
     </div>
   );
 }
