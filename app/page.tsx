@@ -32,6 +32,7 @@ async function getRecentlyPlayed() {
 export default function HomePage() {
   const [games, setGames] = useState<any[]>([]);
   const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
@@ -48,11 +49,54 @@ export default function HomePage() {
       const recentGames = await getRecentlyPlayed();
       setRecentlyPlayed(recentGames);
 
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: favs } = await supabase
+          .from("favorites")
+          .select("game_slug")
+          .eq("user_id", user.id);
+
+        setFavorites(favs?.map((f) => f.game_slug) || []);
+      }
+
       setLoading(false);
     }
 
     loadGames();
   }, []);
+
+  async function toggleFavorite(gameSlug: string) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
+    const isFav = favorites.includes(gameSlug);
+
+    if (isFav) {
+      await supabase
+        .from("favorites")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("game_slug", gameSlug);
+
+      setFavorites((prev) => prev.filter((slug) => slug !== gameSlug));
+    } else {
+      await supabase.from("favorites").insert({
+        user_id: user.id,
+        game_slug: gameSlug,
+      });
+
+      setFavorites((prev) => [...prev, gameSlug]);
+    }
+  }
 
   const categories = [
     "All",
@@ -84,10 +128,24 @@ export default function HomePage() {
     .slice(0, 5);
 
   function GameCard({ game }: { game: any }) {
+    const isFav = favorites.includes(game.slug);
+
     return (
       <Link href={`/game/${game.slug}`}>
         <div className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl transition duration-300 hover:-translate-y-2 hover:shadow-[0_0_40px_rgba(124,58,237,.35)]">
           <div className="relative h-56 overflow-hidden">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                toggleFavorite(game.slug);
+              }}
+              className={`absolute left-4 top-4 z-20 rounded-full p-3 text-white backdrop-blur transition hover:scale-110 ${
+                isFav ? "bg-red-500" : "bg-black/60 hover:bg-red-500"
+              }`}
+            >
+              ❤️
+            </button>
+
             {game.image ? (
               <img
                 loading="lazy"
@@ -137,7 +195,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
             backgroundImage:
-              "url(https://images.template.net/376680/Neon-Gaming-Background-edit-online-1.jpg",
+              "url(https://images.template.net/376680/Neon-Gaming-Background-edit-online-1.jpg)",
           }}
         />
 
