@@ -145,12 +145,12 @@ export default function HomePage() {
 
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-8 py-24">
+        <div className="relative z-10 mx-auto max-w-7xl px-8 py-10">
           <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
             JUDE PLAY
           </p>
 
-          <h1 className="mt-6 max-w-3xl text-5xl font-black leading-tight md:text-6xl">
+          <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight md:text-5xl">
             The Future Of Browser Gaming
           </h1>
 
