@@ -39,7 +39,9 @@ export default function HomeClient({
   const [favorites, setFavorites] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+const [currentPage, setCurrentPage] = useState(1);
 
+const gamesPerPage = 24;
   useEffect(() => {
     async function loadUserData() {
       const recentGames = await getRecentlyPlayed();
@@ -101,7 +103,12 @@ export default function HomeClient({
     const text = `${game.title || ""} ${game.category || ""} ${
       game.meta || ""
     } ${game.description || ""}`;
+const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
 
+const paginatedGames = filteredGames.slice(
+  (currentPage - 1) * gamesPerPage,
+  currentPage * gamesPerPage
+);
     const matchesSearch = text.toLowerCase().includes(query.toLowerCase());
     const matchesCategory =
       selectedCategory === "All" || game.category === selectedCategory;
@@ -320,7 +327,10 @@ export default function HomeClient({
                 {categories.map((category) => (
                   <button
                     key={category}
-                    onClick={() => setSelectedCategory(category)}
+                    onClick={() => {
+  setSelectedCategory(category);
+  setCurrentPage(1);
+}}
                     className={`rounded-full px-5 py-3 text-sm font-bold transition ${
                       selectedCategory === category
                         ? "bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_0_24px_rgba(168,85,247,.35)]"
@@ -333,7 +343,7 @@ export default function HomeClient({
               </div>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-                {filteredGames.map((game) => (
+                {paginatedGames.map((game) => (
                   <GameCard key={game.id} game={game} />
                 ))}
               </div>
@@ -347,7 +357,42 @@ export default function HomeClient({
           )}
         </div>
       </section>
+<div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+  <button
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((prev) => prev - 1)}
+    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+  >
+    ← Prev
+  </button>
 
+  {Array.from({ length: totalPages }, (_, i) => i + 1)
+    .slice(
+      Math.max(currentPage - 3, 0),
+      Math.min(currentPage + 2, totalPages)
+    )
+    .map((page) => (
+      <button
+        key={page}
+        onClick={() => setCurrentPage(page)}
+        className={`rounded-xl px-4 py-2 font-bold transition ${
+          currentPage === page
+            ? "bg-fuchsia-600 text-white"
+            : "border border-white/10 bg-white/5"
+        }`}
+      >
+        {page}
+      </button>
+    ))}
+
+  <button
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((prev) => prev + 1)}
+    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+  >
+    Next →
+  </button>
+</div>
       {recentlyPlayed.length > 0 && (
         <section className="mx-auto max-w-7xl px-8 pb-16">
           <h2 className="text-4xl font-black">🕹 Recently Played</h2>
