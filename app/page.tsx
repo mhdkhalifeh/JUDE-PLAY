@@ -183,7 +183,7 @@ export default function HomePage() {
 
       <section className="mx-auto grid max-w-7xl gap-8 px-8 py-8 lg:grid-cols-[220px_1fr]">
         <aside className="hidden lg:block">
-          <div className="sticky top-24 -mt-[285px] space-y-6">
+          <div className="sticky top-24 -mt-[120px] space-y-6">
             <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
               <h2 className="text-xl font-black">🔥 Most Played</h2>
 
