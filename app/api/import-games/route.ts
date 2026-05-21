@@ -10,17 +10,22 @@ export async function GET() {
     const games = await res.json();
 
     for (const game of games) {
-      await supabase.from("games").upsert({
-        title: game.title,
-        slug: game.title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-"),
-        description: game.description,
-        thumbnail: game.thumb,
-        game_url: game.url,
-        category: game.tags || "Arcade",
-        game_type: "iframe",
-      });
+      await supabase.from("games").upsert(
+  {
+    title: game.title,
+    slug: game.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    description: game.description,
+    meta: game.instructions || game.category || "HTML5 Game",
+    image: game.thumb,
+    game_url: game.url,
+    category: game.category || "Arcade",
+    rating: "5.0",
+    status: "Free",
+    plays: 0,
+    game_type: "iframe",
+  },
+  { onConflict: "slug" }
+);
     }
 
     return NextResponse.json({
