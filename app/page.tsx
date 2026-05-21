@@ -137,7 +137,7 @@ export default function HomePage() {
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
             backgroundImage:
-              "url(https://images.unsplash.com/photo-1542751110-97427bbecf20?q=80&w=1800&auto=format&fit=crop)",
+              "url(https://images.template.net/376680/Neon-Gaming-Background-edit-online-1.jpg",
           }}
         />
 
