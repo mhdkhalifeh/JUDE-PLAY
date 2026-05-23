@@ -115,18 +115,7 @@ const paginatedGames = filteredGames.slice(
 
     return matchesSearch && matchesCategory;
   });
-const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
 
-const paginatedGames = filteredGames.slice(
-  (currentPage - 1) * gamesPerPage,
-  currentPage * gamesPerPage
-);
-const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
-
-const paginatedGames = filteredGames.slice(
-  (currentPage - 1) * gamesPerPage,
-  currentPage * gamesPerPage
-);
   const trendingGames = [...games]
     .sort((a, b) => (b.plays || 0) - (a.plays || 0))
     .slice(0, 5);
