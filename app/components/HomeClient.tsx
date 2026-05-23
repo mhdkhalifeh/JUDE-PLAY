@@ -19,6 +19,7 @@ async function getRecentlyPlayed() {
     .limit(4);
 
   const slugs = recent?.map((item) => item.game_slug) || [];
+
   if (slugs.length === 0) return [];
 
   const { data: games } = await supabase
@@ -39,9 +40,11 @@ export default function HomeClient({
   const [favorites, setFavorites] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-const [currentPage, setCurrentPage] = useState(1);
 
-const gamesPerPage = 24;
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const gamesPerPage = 24;
+
   useEffect(() => {
     async function loadUserData() {
       const recentGames = await getRecentlyPlayed();
@@ -103,18 +106,21 @@ const gamesPerPage = 24;
     const text = `${game.title || ""} ${game.category || ""} ${
       game.meta || ""
     } ${game.description || ""}`;
-const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
 
-const paginatedGames = filteredGames.slice(
-  (currentPage - 1) * gamesPerPage,
-  currentPage * gamesPerPage
-);
     const matchesSearch = text.toLowerCase().includes(query.toLowerCase());
+
     const matchesCategory =
       selectedCategory === "All" || game.category === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
+
+  const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+
+  const paginatedGames = filteredGames.slice(
+    (currentPage - 1) * gamesPerPage,
+    currentPage * gamesPerPage
+  );
 
   const trendingGames = [...games]
     .sort((a, b) => (b.plays || 0) - (a.plays || 0))
@@ -168,7 +174,9 @@ const paginatedGames = filteredGames.slice(
           </div>
 
           <div className="p-5">
-            <h3 className="line-clamp-1 text-xl font-black">{game.title}</h3>
+            <h3 className="line-clamp-1 text-xl font-black">
+              {game.title}
+            </h3>
 
             <p className="mt-2 line-clamp-2 text-sm text-slate-400">
               {game.meta || game.description || ""}
@@ -233,7 +241,10 @@ const paginatedGames = filteredGames.slice(
 
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCurrentPage(1);
+            }}
             placeholder="Search for games..."
             className="mt-4 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-3 text-base outline-none backdrop-blur focus:border-fuchsia-500"
           />
@@ -258,42 +269,6 @@ const paginatedGames = filteredGames.slice(
                 ))}
               </div>
             </div>
-
-            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
-              <h2 className="text-xl font-black">🆕 New Games</h2>
-
-              <div className="mt-4 space-y-3">
-                {newGames.map((game) => (
-                  <Link
-                    key={game.id}
-                    href={`/game/${game.slug}`}
-                    className="block rounded-xl bg-white/5 p-3 text-sm hover:bg-white/10"
-                  >
-                    {game.title}
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
-              <h2 className="text-xl font-black">🏆 Leaderboard</h2>
-
-              <div className="mt-4 space-y-3">
-                {trendingGames.map((game, index) => (
-                  <div
-                    key={game.id}
-                    className="flex items-center justify-between rounded-xl bg-white/5 p-3 text-sm"
-                  >
-                    <span>
-                      #{index + 1} {game.title}
-                    </span>
-                    <span className="text-fuchsia-400">
-                      {game.plays || 0}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         </aside>
 
@@ -304,99 +279,75 @@ const paginatedGames = filteredGames.slice(
                 ? "Filtered Games"
                 : "All Games"}
             </h2>
-
-            <p className="mt-3 text-slate-400">
-              {query
-                ? `Showing results for "${query}"`
-                : selectedCategory !== "All"
-                ? `Showing ${selectedCategory} games`
-                : "Discover the hottest games on JUDE Play"}
-            </p>
           </div>
 
+          <div className="mb-10 flex flex-wrap gap-3">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  setCurrentPage(1);
+                }}
+                className={`rounded-full px-5 py-3 text-sm font-bold transition ${
+                  selectedCategory === category
+                    ? "bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_0_24px_rgba(168,85,247,.35)]"
+                    : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
 
-          {games.length === 0 && (
-            <div className="rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-              No games found yet. Add your first game from Admin Dashboard.
-            </div>
-          )}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {paginatedGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
 
-          {games.length > 0 && (
-            <>
-              <div className="mb-10 flex flex-wrap gap-3">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => {
-  setSelectedCategory(category);
-  setCurrentPage(1);
-}}
-                    className={`rounded-full px-5 py-3 text-sm font-bold transition ${
-                      selectedCategory === category
-                        ? "bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-[0_0_24px_rgba(168,85,247,.35)]"
-                        : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => prev - 1)}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+            >
+              ← Prev
+            </button>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-                {paginatedGames.map((game) => (
-                  <GameCard key={game.id} game={game} />
-                ))}
-              </div>
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .slice(
+                Math.max(currentPage - 3, 0),
+                Math.min(currentPage + 2, totalPages)
+              )
+              .map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`rounded-xl px-4 py-2 font-bold transition ${
+                    currentPage === page
+                      ? "bg-fuchsia-600 text-white"
+                      : "border border-white/10 bg-white/5"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
 
-              {filteredGames.length === 0 && (
-                <div className="mt-10 rounded-3xl border border-white/10 bg-slate-950 p-8 text-slate-400">
-                  No games found.
-                </div>
-              )}
-            </>
-          )}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => prev + 1)}
+              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </section>
-<div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-  <button
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((prev) => prev - 1)}
-    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
-  >
-    ← Prev
-  </button>
 
-  {Array.from({ length: totalPages }, (_, i) => i + 1)
-    .slice(
-      Math.max(currentPage - 3, 0),
-      Math.min(currentPage + 2, totalPages)
-    )
-    .map((page) => (
-      <button
-        key={page}
-        onClick={() => setCurrentPage(page)}
-        className={`rounded-xl px-4 py-2 font-bold transition ${
-          currentPage === page
-            ? "bg-fuchsia-600 text-white"
-            : "border border-white/10 bg-white/5"
-        }`}
-      >
-        {page}
-      </button>
-    ))}
-
-  <button
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((prev) => prev + 1)}
-    className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
-  >
-    Next →
-  </button>
-</div>
       {recentlyPlayed.length > 0 && (
         <section className="mx-auto max-w-7xl px-8 pb-16">
           <h2 className="text-4xl font-black">🕹 Recently Played</h2>
-          <p className="mt-3 text-slate-400">Continue where you left off.</p>
 
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {recentlyPlayed.map((game) => (
