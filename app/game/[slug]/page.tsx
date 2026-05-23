@@ -3,6 +3,7 @@ import { supabase } from "@/app/lib/supabase";
 import FavoriteButton from "@/app/components/FavoriteButton";
 import GameFrame from "@/app/components/GameFrame";
 import AchievementTracker from "@/app/components/AchievementTracker";
+import GameActivityTracker from "@/app/components/GameActivityTracker";
 
 async function getGame(slug: string) {
   const { data } = await supabase
@@ -25,24 +26,6 @@ async function getRelatedGames(category: string, slug: string) {
   return data || [];
 }
 
-async function saveRecentlyPlayed(slug: string) {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) return;
-
-  await supabase
-    .from("recently_played")
-    .delete()
-    .eq("user_id", user.id)
-    .eq("game_slug", slug);
-
-  await supabase.from("recently_played").insert({
-    user_id: user.id,
-    game_slug: slug,
-  });
-}
 
 export async function generateMetadata({
   params,
@@ -140,7 +123,7 @@ export default async function GamePage({
     .update({ plays: (game.plays || 0) + 1 })
     .eq("id", game.id);
 
-  await saveRecentlyPlayed(game.slug);
+ 
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -164,6 +147,7 @@ export default async function GamePage({
   return (
     <main className="min-h-screen bg-[#050816] text-white">
       <AchievementTracker />
+      <GameActivityTracker slug={game.slug} />
 
       <script
         type="application/ld+json"
