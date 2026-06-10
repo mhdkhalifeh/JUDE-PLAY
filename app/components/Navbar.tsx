@@ -52,7 +52,12 @@ export default function Navbar() {
               >
                 Favorites
               </Link>
-
+<Link
+  href="/top-games"
+  className="text-slate-300 transition hover:text-fuchsia-400"
+>
+  Top Games
+</Link>
               <Link
                 href="/profile"
                 className="transition hover:text-fuchsia-400"
