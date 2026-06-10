@@ -62,6 +62,13 @@ export default function Navbar() {
 >
   FAQ
 </Link>
+
+<Link
+  href="/about"
+  className="rounded-xl px-3 py-2 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+>
+  ℹ️ About
+</Link>
         </nav>
 
         <div className="flex items-center gap-3">
