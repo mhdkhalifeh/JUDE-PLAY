@@ -59,6 +59,7 @@ export default function Navbar() {
   Top Games
 </Link>
 <Link href="/new-games">New Games</Link>
+<Link href="/categories">Categories</Link>
               <Link
                 href="/profile"
                 className="transition hover:text-fuchsia-400"
