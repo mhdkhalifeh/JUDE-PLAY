@@ -13,22 +13,26 @@ async function getStats() {
     ...new Set(games?.map((game: any) => game.category).filter(Boolean)),
   ];
 
-  const mostPlayed = [...(games || [])].sort(
+  const sortedGames = [...(games || [])].sort(
     (a: any, b: any) => (b.plays || 0) - (a.plays || 0)
-  )[0];
+  );
+
+  const mostPlayed = sortedGames[0];
+  const topGames = sortedGames.slice(0, 10);
 
   return {
     totalGames,
     totalPlays,
     totalCategories: categories.length,
     mostPlayed,
+    topGames,
   };
 }
 
 export const metadata = {
   title: "JUDE Play Stats | Free Browser Games",
   description:
-    "View JUDE Play gaming statistics including total games, total plays, categories and the most popular browser games.",
+    "View JUDE Play gaming statistics including total games, total plays, categories, top games and the most popular browser games.",
 };
 
 export default async function StatsPage() {
@@ -41,9 +45,7 @@ export default async function StatsPage() {
           JUDE PLAY STATS
         </p>
 
-        <h1 className="mt-4 text-5xl font-black">
-          Platform Statistics
-        </h1>
+        <h1 className="mt-4 text-5xl font-black">Platform Statistics</h1>
 
         <p className="mt-4 max-w-4xl text-slate-400">
           Explore JUDE Play statistics, including the number of available
@@ -95,6 +97,36 @@ export default async function StatsPage() {
             </Link>
           </section>
         )}
+
+        <section className="mt-12 rounded-3xl border border-white/10 bg-slate-950 p-8">
+          <h2 className="text-3xl font-black">Top 10 Games</h2>
+
+          <div className="mt-8 grid gap-4">
+            {stats.topGames.map((game: any, index: number) => (
+              <Link
+                key={game.id}
+                href={`/game/${game.slug}`}
+                className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-fuchsia-500 hover:bg-white/10"
+              >
+                <div>
+                  <h3 className="text-xl font-black">
+                    #{index + 1} {game.title}
+                  </h3>
+
+                  <p className="mt-2 line-clamp-2 text-sm text-slate-400">
+                    {game.description ||
+                      game.meta ||
+                      `Play ${game.title} online for free on JUDE Play.`}
+                  </p>
+                </div>
+
+                <div className="ml-6 shrink-0 rounded-xl bg-fuchsia-600/20 px-4 py-2 text-fuchsia-300">
+                  🔥 {game.plays || 0}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-12 rounded-3xl border border-white/10 bg-slate-950 p-8">
           <h2 className="text-3xl font-black">About JUDE Play Growth</h2>
