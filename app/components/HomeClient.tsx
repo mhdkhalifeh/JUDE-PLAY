@@ -134,6 +134,15 @@ export default function HomeClient({
     )
     .slice(0, 5);
 
+    const totalPlays = games.reduce(
+  (sum, game) => sum + (game.plays || 0),
+  0
+);
+
+const featuredGames = [...games]
+  .sort((a, b) => (b.plays || 0) - (a.plays || 0))
+  .slice(0, 3);
+
   function GameCard({ game }: { game: any }) {
     const isFav = favorites.includes(game.slug);
 
@@ -222,6 +231,24 @@ export default function HomeClient({
           <p className="mt-3 max-w-2xl text-slate-300">
             Play instantly. No downloads. Just games.
           </p>
+          <div className="mt-5 grid max-w-2xl grid-cols-3 gap-3">
+  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+    <p className="text-xs text-slate-400">Games</p>
+    <p className="mt-1 text-2xl font-black text-white">{games.length}</p>
+  </div>
+
+  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+    <p className="text-xs text-slate-400">Plays</p>
+    <p className="mt-1 text-2xl font-black text-white">{totalPlays}</p>
+  </div>
+
+  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+    <p className="text-xs text-slate-400">Categories</p>
+    <p className="mt-1 text-2xl font-black text-white">
+      {categories.length - 1}
+    </p>
+  </div>
+</div>
 
           <div className="mt-5 flex flex-wrap gap-4">
             {games[0] && (
@@ -280,6 +307,70 @@ export default function HomeClient({
                 : "All Games"}
             </h2>
           </div>
+
+{featuredGames.length > 0 && (
+  <section className="mb-12">
+    <div className="mb-6 flex items-center justify-between">
+      <div>
+        <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
+          FEATURED
+        </p>
+        <h2 className="mt-2 text-4xl font-black">Featured Games</h2>
+      </div>
+
+      <Link
+        href="/top-games"
+        className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10"
+      >
+        View Top Games →
+      </Link>
+    </div>
+
+    <div className="grid gap-6 lg:grid-cols-3">
+      {featuredGames.map((game) => (
+        <Link
+          key={game.id}
+          href={`/game/${game.slug}`}
+          className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
+        >
+          <div className="relative h-64 overflow-hidden">
+            {game.image ? (
+              <img
+                loading="lazy"
+                src={game.image}
+                alt={game.title}
+                className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-slate-900 text-slate-500">
+                No Image
+              </div>
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+            <div className="absolute bottom-5 left-5 right-5">
+              <h3 className="text-2xl font-black">{game.title}</h3>
+              <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                {game.description || game.meta}
+              </p>
+
+              <div className="mt-4 flex items-center justify-between">
+                <span className="rounded-full bg-fuchsia-600/30 px-4 py-2 text-sm text-fuchsia-200">
+                  {game.category || "Game"}
+                </span>
+
+                <span className="rounded-full bg-black/50 px-4 py-2 text-sm text-yellow-400">
+                  🔥 {game.plays || 0}
+                </span>
+              </div>
+            </div>
+          </div>
+        </Link>
+      ))}
+    </div>
+  </section>
+)}
 
           <div className="mb-10 flex flex-wrap gap-3">
             {categories.map((category) => (
