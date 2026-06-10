@@ -356,6 +356,42 @@ export default function HomeClient({
           </div>
         </section>
       )}
+      <section className="mx-auto max-w-7xl px-8 pb-20">
+  <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
+    <h2 className="text-4xl font-black mb-6">
+      About JUDE Play
+    </h2>
+
+    <div className="space-y-6 text-slate-300 leading-8">
+      <p>
+        JUDE Play is a free online gaming platform that offers hundreds of
+        browser-based HTML5 games across multiple categories including
+        action, puzzle, racing, adventure, arcade, sports and multiplayer
+        games.
+      </p>
+
+      <p>
+        Our mission is to make gaming accessible to everyone without the
+        need for downloads, installations or expensive hardware. Every
+        game can be played instantly from your browser on desktop, tablet
+        or mobile devices.
+      </p>
+
+      <p>
+        Whether you enjoy fast-paced action games, relaxing puzzle games,
+        exciting racing experiences or competitive multiplayer challenges,
+        JUDE Play provides a growing library of games for players of all
+        ages.
+      </p>
+
+      <p>
+        New games are added regularly to ensure fresh content and a better
+        gaming experience for our community. Explore categories, discover
+        trending titles and enjoy unlimited gaming completely free.
+      </p>
+    </div>
+  </div>
+</section>
     </div>
   );
 }
