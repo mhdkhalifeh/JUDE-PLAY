@@ -56,6 +56,12 @@ export default function Navbar() {
   📝 Blog
 </Link>
 
+<Link
+  href="/faq"
+  className="rounded-xl px-3 py-2 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+>
+  FAQ
+</Link>
         </nav>
 
         <div className="flex items-center gap-3">
