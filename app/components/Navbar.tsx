@@ -48,7 +48,14 @@ export default function Navbar() {
           <Link className="rounded-xl px-4 py-2 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white" href="/favorites">
             ❤️ Favorites
           </Link>
-          <Link href="/blog">Blog</Link>
+          
+          <Link
+  href="/blog"
+  className="rounded-xl px-3 py-2 text-sm font-bold text-slate-300 transition hover:bg-white/10 hover:text-white"
+>
+  📝 Blog
+</Link>
+
         </nav>
 
         <div className="flex items-center gap-3">
