@@ -1,7 +1,6 @@
-import Navbar from "@/app/components/Navbar";
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-[#070914] p-8 text-white"> <Navbar />
+    <div className="min-h-screen bg-[#070914] p-8 text-white"> 
       <div className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-slate-950 p-8">
 
         <h1 className="text-4xl font-black">
