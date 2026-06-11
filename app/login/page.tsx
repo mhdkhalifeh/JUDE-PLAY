@@ -8,6 +8,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
 
  async function signUp() {
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+
+  if (password.length < 6) {
+    alert("Password must be at least 6 characters");
+    return;
+  }
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -18,8 +28,7 @@ export default function LoginPage() {
     return;
   }
 
-  alert("Account created successfully");
-  window.location.href = "/profile";
+  alert("Account created successfully. Please check your email if confirmation is required.");
 }
 
   async function login() {
