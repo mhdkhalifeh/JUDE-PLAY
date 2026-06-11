@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/app/lib/supabase";
 import {
   Home,
@@ -18,16 +18,44 @@ import {
   Heart,
   User,
   LogOut,
+  LogIn,
 } from "lucide-react";
 
 export default function Navbar() {
-  const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [checkingUser, setCheckingUser] = useState(true);
+
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setUser(user);
+      setCheckingUser(false);
+    }
+
+    checkUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+      setCheckingUser(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   async function logout() {
     await supabase.auth.signOut();
-    router.push("/login");
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = "/login";
   }
 
   const mainLinks = [
@@ -68,8 +96,13 @@ export default function Navbar() {
         <nav className="hidden items-center gap-2 lg:flex">
           {mainLinks.map((item) => {
             const Icon = item.icon;
+
             return (
-              <Link key={item.href} href={item.href} className={linkClass(item.href)}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={linkClass(item.href)}
+              >
                 <Icon size={17} />
                 {item.label}
               </Link>
@@ -89,6 +122,7 @@ export default function Navbar() {
               <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-white/10 bg-slate-950 p-3 shadow-2xl">
                 {moreLinks.map((item) => {
                   const Icon = item.icon;
+
                   return (
                     <Link
                       key={item.href}
@@ -107,21 +141,35 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link
-            href="/profile"
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-black text-white shadow-[0_0_25px_rgba(168,85,247,.45)]"
-          >
-            <User size={17} />
-            Profile
-          </Link>
+          {!checkingUser && user && (
+            <>
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-black text-white shadow-[0_0_25px_rgba(168,85,247,.45)]"
+              >
+                <User size={17} />
+                Profile
+              </Link>
 
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-white hover:bg-white/10"
-          >
-            <LogOut size={17} />
-            Logout
-          </button>
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-5 py-2 text-sm font-bold text-white hover:bg-white/10"
+              >
+                <LogOut size={17} />
+                Logout
+              </button>
+            </>
+          )}
+
+          {!checkingUser && !user && (
+            <Link
+              href="/login"
+              className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-5 py-2 text-sm font-black text-white shadow-[0_0_25px_rgba(168,85,247,.45)]"
+            >
+              <LogIn size={17} />
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </header>
