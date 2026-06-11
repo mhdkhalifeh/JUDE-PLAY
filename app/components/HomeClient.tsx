@@ -19,7 +19,6 @@ async function getRecentlyPlayed() {
     .limit(4);
 
   const slugs = recent?.map((item) => item.game_slug) || [];
-
   if (slugs.length === 0) return [];
 
   const { data: games } = await supabase
@@ -30,17 +29,12 @@ async function getRecentlyPlayed() {
   return games || [];
 }
 
-export default function HomeClient({
-  initialGames,
-}: {
-  initialGames: any[];
-}) {
-  const [games, setGames] = useState<any[]>(initialGames);
+export default function HomeClient({ initialGames }: { initialGames: any[] }) {
+  const [games] = useState<any[]>(initialGames);
   const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-
   const [currentPage, setCurrentPage] = useState(1);
 
   const gamesPerPage = 24;
@@ -107,12 +101,10 @@ export default function HomeClient({
       game.meta || ""
     } ${game.description || ""}`;
 
-    const matchesSearch = text.toLowerCase().includes(query.toLowerCase());
-
-    const matchesCategory =
-      selectedCategory === "All" || game.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
+    return (
+      text.toLowerCase().includes(query.toLowerCase()) &&
+      (selectedCategory === "All" || game.category === selectedCategory)
+    );
   });
 
   const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
@@ -124,24 +116,11 @@ export default function HomeClient({
 
   const trendingGames = [...games]
     .sort((a, b) => (b.plays || 0) - (a.plays || 0))
-    .slice(0, 5);
+    .slice(0, 8);
 
-  const newGames = [...games]
-    .sort(
-      (a, b) =>
-        new Date(b.created_at).getTime() -
-        new Date(a.created_at).getTime()
-    )
-    .slice(0, 5);
+  const featuredGames = trendingGames.slice(0, 3);
 
-    const totalPlays = games.reduce(
-  (sum, game) => sum + (game.plays || 0),
-  0
-);
-
-const featuredGames = [...games]
-  .sort((a, b) => (b.plays || 0) - (a.plays || 0))
-  .slice(0, 3);
+  const totalPlays = games.reduce((sum, game) => sum + (game.plays || 0), 0);
 
   function GameCard({ game }: { game: any }) {
     const isFav = favorites.includes(game.slug);
@@ -183,9 +162,7 @@ const featuredGames = [...games]
           </div>
 
           <div className="p-5">
-            <h3 className="line-clamp-1 text-xl font-black">
-              {game.title}
-            </h3>
+            <h3 className="line-clamp-1 text-xl font-black">{game.title}</h3>
 
             <p className="mt-2 line-clamp-2 text-sm text-slate-400">
               {game.meta || game.description || ""}
@@ -208,7 +185,7 @@ const featuredGames = [...games]
 
   return (
     <div className="min-h-screen bg-[#070914] text-white">
-      <section className="relative ml-[260px] max-h-[320px] overflow-hidden border-b border-white/10 max-lg:ml-0">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
@@ -219,38 +196,20 @@ const featuredGames = [...games]
 
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
 
-        <div className="relative z-10 px-8 py-6">
+        <div className="relative z-10 mx-auto max-w-7xl px-8 py-12">
           <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
             JUDE PLAY
           </p>
 
-          <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-4xl">
+          <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight md:text-6xl">
             The Future Of Browser Gaming
           </h1>
 
-          <p className="mt-3 max-w-2xl text-slate-300">
+          <p className="mt-4 max-w-2xl text-lg text-slate-300">
             Play instantly. No downloads. Just games.
           </p>
-          <div className="mt-5 grid max-w-2xl grid-cols-3 gap-3">
-  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-    <p className="text-xs text-slate-400">Games</p>
-    <p className="mt-1 text-2xl font-black text-white">{games.length}</p>
-  </div>
 
-  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-    <p className="text-xs text-slate-400">Plays</p>
-    <p className="mt-1 text-2xl font-black text-white">{totalPlays}</p>
-  </div>
-
-  <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-    <p className="text-xs text-slate-400">Categories</p>
-    <p className="mt-1 text-2xl font-black text-white">
-      {categories.length - 1}
-    </p>
-  </div>
-</div>
-
-          <div className="mt-5 flex flex-wrap gap-4">
+          <div className="mt-7 flex flex-wrap gap-4">
             {games[0] && (
               <Link href={`/game/${games[0].slug}`}>
                 <button className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 py-3 text-base font-black shadow-[0_0_30px_rgba(168,85,247,.35)]">
@@ -266,6 +225,25 @@ const featuredGames = [...games]
             </a>
           </div>
 
+          <div className="mt-7 grid max-w-2xl grid-cols-3 gap-3">
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Games</p>
+              <p className="mt-1 text-2xl font-black">{games.length}</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Plays</p>
+              <p className="mt-1 text-2xl font-black">{totalPlays}</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Categories</p>
+              <p className="mt-1 text-2xl font-black">
+                {categories.length - 1}
+              </p>
+            </div>
+          </div>
+
           <input
             value={query}
             onChange={(e) => {
@@ -273,104 +251,104 @@ const featuredGames = [...games]
               setCurrentPage(1);
             }}
             placeholder="Search for games..."
-            className="mt-4 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-3 text-base outline-none backdrop-blur focus:border-fuchsia-500"
+            className="mt-6 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-base outline-none backdrop-blur focus:border-fuchsia-500"
           />
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-8 py-8 lg:grid-cols-[220px_1fr]">
-        <aside className="hidden lg:block">
-          <div className="sticky top-28 -mt-[30px] -ml-6 space-y-6">
-            <div className="rounded-3xl border border-white/10 bg-slate-950 p-5">
-              <h2 className="text-xl font-black">🔥 Most Played</h2>
-
-              <div className="mt-4 space-y-3">
-                {trendingGames.map((game, index) => (
-                  <Link
-                    key={game.id}
-                    href={`/game/${game.slug}`}
-                    className="block rounded-xl bg-white/5 p-3 text-sm hover:bg-white/10"
-                  >
-                    #{index + 1} {game.title}
-                  </Link>
-                ))}
+      <section className="mx-auto max-w-7xl px-8 py-10">
+        {featuredGames.length > 0 && (
+          <section className="mb-14">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
+                  FEATURED
+                </p>
+                <h2 className="mt-2 text-4xl font-black">Featured Games</h2>
               </div>
+
+              <Link
+                href="/top-games"
+                className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10"
+              >
+                View Top Games →
+              </Link>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {featuredGames.map((game) => (
+                <Link
+                  key={game.id}
+                  href={`/game/${game.slug}`}
+                  className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
+                >
+                  <div className="relative h-72 overflow-hidden">
+                    {game.image ? (
+                      <img
+                        loading="lazy"
+                        src={game.image}
+                        alt={game.title}
+                        className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center bg-slate-900 text-slate-500">
+                        No Image
+                      </div>
+                    )}
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+                    <div className="absolute bottom-5 left-5 right-5">
+                      <h3 className="text-2xl font-black">{game.title}</h3>
+                      <p className="mt-2 line-clamp-2 text-sm text-slate-300">
+                        {game.description || game.meta}
+                      </p>
+
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="rounded-full bg-fuchsia-600/30 px-4 py-2 text-sm text-fuchsia-200">
+                          {game.category || "Game"}
+                        </span>
+
+                        <span className="rounded-full bg-black/50 px-4 py-2 text-sm text-yellow-400">
+                          🔥 {game.plays || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="mb-14">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
+                TRENDING
+              </p>
+              <h2 className="mt-2 text-4xl font-black">Trending Now</h2>
             </div>
           </div>
-        </aside>
+
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {trendingGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        </section>
 
         <div id="games">
           <div className="mb-8">
-            <h2 className="text-4xl font-black">
+            <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
+              BROWSE
+            </p>
+            <h2 className="mt-2 text-4xl font-black">
               {query || selectedCategory !== "All"
                 ? "Filtered Games"
                 : "All Games"}
             </h2>
           </div>
-
-{featuredGames.length > 0 && (
-  <section className="mb-12">
-    <div className="mb-6 flex items-center justify-between">
-      <div>
-        <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
-          FEATURED
-        </p>
-        <h2 className="mt-2 text-4xl font-black">Featured Games</h2>
-      </div>
-
-      <Link
-        href="/top-games"
-        className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10"
-      >
-        View Top Games →
-      </Link>
-    </div>
-
-    <div className="grid gap-6 lg:grid-cols-3">
-      {featuredGames.map((game) => (
-        <Link
-          key={game.id}
-          href={`/game/${game.slug}`}
-          className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
-        >
-          <div className="relative h-64 overflow-hidden">
-            {game.image ? (
-              <img
-                loading="lazy"
-                src={game.image}
-                alt={game.title}
-                className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center bg-slate-900 text-slate-500">
-                No Image
-              </div>
-            )}
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-            <div className="absolute bottom-5 left-5 right-5">
-              <h3 className="text-2xl font-black">{game.title}</h3>
-              <p className="mt-2 line-clamp-2 text-sm text-slate-300">
-                {game.description || game.meta}
-              </p>
-
-              <div className="mt-4 flex items-center justify-between">
-                <span className="rounded-full bg-fuchsia-600/30 px-4 py-2 text-sm text-fuchsia-200">
-                  {game.category || "Game"}
-                </span>
-
-                <span className="rounded-full bg-black/50 px-4 py-2 text-sm text-yellow-400">
-                  🔥 {game.plays || 0}
-                </span>
-              </div>
-            </div>
-          </div>
-        </Link>
-      ))}
-    </div>
-  </section>
-)}
 
           <div className="mb-10 flex flex-wrap gap-3">
             {categories.map((category) => (
@@ -397,42 +375,44 @@ const featuredGames = [...games]
             ))}
           </div>
 
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => prev - 1)}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
-            >
-              ← Prev
-            </button>
+          {totalPages > 1 && (
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage((prev) => prev - 1)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+              >
+                ← Prev
+              </button>
 
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .slice(
-                Math.max(currentPage - 3, 0),
-                Math.min(currentPage + 2, totalPages)
-              )
-              .map((page) => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`rounded-xl px-4 py-2 font-bold transition ${
-                    currentPage === page
-                      ? "bg-fuchsia-600 text-white"
-                      : "border border-white/10 bg-white/5"
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .slice(
+                  Math.max(currentPage - 3, 0),
+                  Math.min(currentPage + 2, totalPages)
+                )
+                .map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`rounded-xl px-4 py-2 font-bold transition ${
+                      currentPage === page
+                        ? "bg-fuchsia-600 text-white"
+                        : "border border-white/10 bg-white/5"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
 
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
-            >
-              Next →
-            </button>
-          </div>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 disabled:opacity-40"
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -447,42 +427,41 @@ const featuredGames = [...games]
           </div>
         </section>
       )}
+
       <section className="mx-auto max-w-7xl px-8 pb-20">
-  <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
-    <h2 className="text-4xl font-black mb-6">
-      About JUDE Play
-    </h2>
+        <div className="rounded-3xl border border-white/10 bg-slate-950 p-8">
+          <h2 className="mb-6 text-4xl font-black">About JUDE Play</h2>
 
-    <div className="space-y-6 text-slate-300 leading-8">
-      <p>
-        JUDE Play is a free online gaming platform that offers hundreds of
-        browser-based HTML5 games across multiple categories including
-        action, puzzle, racing, adventure, arcade, sports and multiplayer
-        games.
-      </p>
+          <div className="space-y-6 leading-8 text-slate-300">
+            <p>
+              JUDE Play is a free online gaming platform that offers hundreds of
+              browser-based HTML5 games across multiple categories including
+              action, puzzle, racing, adventure, arcade, sports and multiplayer
+              games.
+            </p>
 
-      <p>
-        Our mission is to make gaming accessible to everyone without the
-        need for downloads, installations or expensive hardware. Every
-        game can be played instantly from your browser on desktop, tablet
-        or mobile devices.
-      </p>
+            <p>
+              Our mission is to make gaming accessible to everyone without the
+              need for downloads, installations or expensive hardware. Every
+              game can be played instantly from your browser on desktop, tablet
+              or mobile devices.
+            </p>
 
-      <p>
-        Whether you enjoy fast-paced action games, relaxing puzzle games,
-        exciting racing experiences or competitive multiplayer challenges,
-        JUDE Play provides a growing library of games for players of all
-        ages.
-      </p>
+            <p>
+              Whether you enjoy fast-paced action games, relaxing puzzle games,
+              exciting racing experiences or competitive multiplayer challenges,
+              JUDE Play provides a growing library of games for players of all
+              ages.
+            </p>
 
-      <p>
-        New games are added regularly to ensure fresh content and a better
-        gaming experience for our community. Explore categories, discover
-        trending titles and enjoy unlimited gaming completely free.
-      </p>
-    </div>
-  </div>
-</section>
+            <p>
+              New games are added regularly to ensure fresh content and a better
+              gaming experience for our community. Explore categories, discover
+              trending titles and enjoy unlimited gaming completely free.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
