@@ -3,19 +3,18 @@ import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "JUDE Play",
-  description: "Play the best HTML5 browser games online instantly.",
-  manifest: "/manifest.json",
-
+  description: "Play free online games",
   verification: {
-    google: "p374ZgarSEzrqSxEtYE9A52mynaz5nZaHCaxRHSP4oU",
+    google: "UiLKAHH70uSkc0Zq722p58jPJ1xEXQMqKsd_-uyqKNw",
   },
+
 
   openGraph: {
     title: "JUDE Play",
     description: "Play the best HTML5 browser games online instantly.",
-    url: "https://jude-play.vercel.app",
+    url: "https://jude-play.com",
     siteName: "JUDE Play",
     images: [
       {
