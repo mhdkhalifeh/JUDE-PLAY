@@ -5,7 +5,7 @@ const posts = [
     title: "Best Browser Games to Play Online",
     slug: "best-browser-games",
     description:
-      "Discover some of the best browser games you can play instantly without downloads or installation.",
+      "Discover the best browser games you can play instantly without downloads or installation.",
   },
   {
     title: "Why HTML5 Games Are Popular",
@@ -21,7 +21,7 @@ const posts = [
   },
   {
     title: "Free Online Games Without Downloads",
-    slug: "free-online-games-without-downloads",
+    slug: "free-online-games",
     description:
       "A guide to playing free online games directly in your browser without installing anything.",
   },
@@ -29,7 +29,25 @@ const posts = [
     title: "Best Game Categories on JUDE Play",
     slug: "best-game-categories",
     description:
-      "Explore the main game categories available on JUDE Play including action, racing, puzzle and arcade.",
+      "Explore the most popular game categories available on JUDE Play.",
+  },
+  {
+    title: "The Rise of Multiplayer Browser Games",
+    slug: "multiplayer-browser-games",
+    description:
+      "Why multiplayer browser games continue to grow in popularity.",
+  },
+  {
+    title: "Why Browser Games Work Great on Mobile Devices",
+    slug: "browser-games-mobile",
+    description:
+      "Discover how browser games provide smooth mobile gaming experiences.",
+  },
+  {
+    title: "The Future of Browser Gaming",
+    slug: "future-of-browser-gaming",
+    description:
+      "How browser gaming continues to evolve and attract millions of players.",
   },
 ];
 
