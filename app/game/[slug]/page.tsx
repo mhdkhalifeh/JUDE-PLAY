@@ -68,7 +68,7 @@ export async function generateMetadata({
     openGraph: {
       title: `${game.title} | JUDE Play`,
       description,
-      url: `https://jude-play.vercel.app/game/${game.slug}`,
+      url: `https://jude-play.com/game/${game.slug}`,
       siteName: "JUDE Play",
       images: [
         {
@@ -131,7 +131,7 @@ export default async function GamePage({
     name: game.title,
     description: game.description || game.meta,
     image: game.image,
-    url: `https://jude-play.vercel.app/game/${game.slug}`,
+    url: `https://jude-play.com/game/${game.slug}`,
     genre: game.category,
     applicationCategory: "Game",
     operatingSystem: "Web Browser",

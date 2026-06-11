@@ -5,6 +5,6 @@ export default function robots() {
       allow: "/",
       disallow: ["/admin"],
     },
-    sitemap: "https://jude-play.vercel.app/sitemap.xml",
+    sitemap: "https://jude-play.com/sitemap.xml",
   };
 }

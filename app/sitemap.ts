@@ -1,7 +1,7 @@
 import { supabase } from "@/app/lib/supabase";
 
 export default async function sitemap() {
-  const siteUrl = "https://jude-play.vercel.app";
+  const siteUrl = "https://jude-play.com";
 
   const { data: games } = await supabase
     .from("games")
