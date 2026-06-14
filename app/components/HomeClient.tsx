@@ -244,21 +244,27 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
             </div>
           </div>
 
-          <input
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            placeholder="Search for games..."
-            className="mt-6 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-4 text-base outline-none backdrop-blur focus:border-fuchsia-500"
-          />
+         <input
+  value={query}
+  onChange={(e) => {
+    setQuery(e.target.value);
+    setCurrentPage(1);
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      document.getElementById("games")?.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }}
+  placeholder="Search for games..."
+  className="mt-4 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-3 text-base outline-none backdrop-blur focus:border-fuchsia-500"
+/>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-8 py-10">
-        {featuredGames.length > 0 && (
-          <section className="mb-14">
+{featuredGames.length > 0 && query.trim() === "" && selectedCategory === "All" && (          <section className="mb-14">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
