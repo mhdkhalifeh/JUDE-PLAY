@@ -3,14 +3,13 @@ import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 
-export const metadata = {
+export const metadata: Metadata = {
+  metadataBase: new URL("https://jude-play.com"),
   title: "JUDE Play",
-  description: "Play free online games",
+  description: "Play the best HTML5 browser games online instantly.",
   verification: {
     google: "UiLKAHH70uSkc0Zq722p58jPJ1xEXQMqKsd_-uyqKNw",
   },
-
-
   openGraph: {
     title: "JUDE Play",
     description: "Play the best HTML5 browser games online instantly.",
@@ -18,20 +17,19 @@ export const metadata = {
     siteName: "JUDE Play",
     images: [
       {
-        url: "/logo.png",
+        url: "https://jude-play.com/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "JUDE Play",
+        alt: "JUDE Play - Free Browser Games",
       },
     ],
     type: "website",
   },
-
   twitter: {
     card: "summary_large_image",
     title: "JUDE Play",
     description: "Play the best HTML5 browser games online instantly.",
-    images: ["/logo.png"],
+    images: ["https://jude-play.com/og-image.jpg"],
   },
 };
 
