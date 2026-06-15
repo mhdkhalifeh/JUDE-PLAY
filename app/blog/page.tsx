@@ -49,6 +49,36 @@ const posts = [
     description:
       "How browser gaming continues to evolve and attract millions of players.",
   },
+  {
+  title: "Best Racing Games You Can Play in Your Browser",
+  slug: "best-racing-games-browser",
+  description:
+    "Discover why browser racing games are perfect for quick speed challenges, casual competition and instant fun without downloads.",
+},
+{
+  title: "Top Action Games for Fast-Paced Fun",
+  slug: "top-action-games-online",
+  description:
+    "Explore action games that challenge reflexes, timing and decision-making directly from your browser.",
+},
+{
+  title: "Best Arcade Games to Play for Free",
+  slug: "best-arcade-games",
+  description:
+    "Learn why arcade games remain popular and how free browser arcade games deliver simple, addictive fun.",
+},
+{
+  title: "How Browser Games Have Changed Over the Years",
+  slug: "history-of-browser-games",
+  description:
+    "A look at how browser games evolved from simple web games to modern HTML5 gaming experiences.",
+},
+{
+  title: "Best Games to Play During Short Breaks",
+  slug: "games-for-short-breaks",
+  description:
+    "Discover why browser games are perfect for short breaks, quick entertainment and casual gaming sessions.",
+},
 ];
 
 export const metadata = {
@@ -81,6 +111,7 @@ export const metadata = {
       "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
     images: ["https://jude-play.com/og-image.jpg"],
   },
+  
 };
 
 export default function BlogPage() {
