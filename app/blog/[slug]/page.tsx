@@ -142,15 +142,41 @@ export async function generateMetadata({
   if (!post) {
     return {
       title: "Article Not Found | JUDE Play",
+      alternates: {
+        canonical: "https://jude-play.com/blog",
+      },
     };
   }
 
   return {
     title: `${post.title} | JUDE Play Blog`,
     description: post.description,
+    alternates: {
+      canonical: `https://jude-play.com/blog/${slug}`,
+    },
+    openGraph: {
+      title: `${post.title} | JUDE Play Blog`,
+      description: post.description,
+      url: `https://jude-play.com/blog/${slug}`,
+      siteName: "JUDE Play",
+      images: [
+        {
+          url: "https://jude-play.com/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${post.title} | JUDE Play Blog`,
+      description: post.description,
+      images: ["https://jude-play.com/og-image.jpg"],
+    },
   };
 }
-
 export default async function BlogPostPage({
   params,
 }: {

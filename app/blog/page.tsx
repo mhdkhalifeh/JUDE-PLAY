@@ -55,6 +55,32 @@ export const metadata = {
   title: "Gaming Blog | JUDE Play",
   description:
     "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
+  alternates: {
+    canonical: "https://jude-play.com/blog",
+  },
+  openGraph: {
+    title: "Gaming Blog | JUDE Play",
+    description:
+      "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
+    url: "https://jude-play.com/blog",
+    siteName: "JUDE Play",
+    images: [
+      {
+        url: "https://jude-play.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "JUDE Play Blog",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gaming Blog | JUDE Play",
+    description:
+      "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
+    images: ["https://jude-play.com/og-image.jpg"],
+  },
 };
 
 export default function BlogPage() {
