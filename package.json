@@ -10,6 +10,7 @@
     "postbuild": "next-sitemap"
   },
   "dependencies": {
+    "@next/third-parties": "^16.2.9",
     "@supabase/supabase-js": "^2.105.4",
     "adm-zip": "^0.5.17",
     "framer-motion": "^12.38.0",
