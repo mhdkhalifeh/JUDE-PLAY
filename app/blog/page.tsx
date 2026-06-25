@@ -79,6 +79,37 @@ const posts = [
   description:
     "Discover why browser games are perfect for short breaks, quick entertainment and casual gaming sessions.",
 },
+{
+  title: "Best Free HTML5 Games in 2026",
+  slug: "best-free-html5-games-2026",
+  description:
+    "Discover the best free HTML5 browser games to play in 2026 without downloads or installations.",
+},
+{
+  title: "Why Browser Games Are Better Than Downloads",
+  slug: "browser-games-vs-download-games",
+  description:
+    "Compare browser games and downloadable games to discover which option is better for casual gaming.",
+},
+{
+  title: "Most Popular Arcade Games Online",
+  slug: "popular-arcade-games-online",
+  description:
+    "Explore the most popular arcade browser games that deliver fast-paced fun for every player.",
+},
+{
+  title: "Browser Games for Kids",
+  slug: "browser-games-for-kids",
+  description:
+    "Find safe and entertaining browser games for kids that are fun, educational and easy to play.",
+},
+{
+  title: "How Browser Games Keep Improving",
+  slug: "how-browser-games-keep-improving",
+  description:
+    "Learn how browser games continue to evolve with modern web technologies and better gaming experiences.",
+},
+
 ];
 
 export const metadata = {
