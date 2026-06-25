@@ -22,6 +22,18 @@ export default async function sitemap() {
     "multiplayer-browser-games",
     "browser-games-mobile",
     "future-of-browser-gaming",
+
+    // New Articles
+    "best-racing-games-browser",
+    "top-action-games-online",
+    "best-arcade-games",
+    "history-of-browser-games",
+    "games-for-short-breaks",
+    "best-free-html5-games-2026",
+    "browser-games-vs-download-games",
+    "popular-arcade-games-online",
+    "browser-games-for-kids",
+    "how-browser-games-keep-improving",
   ].map((slug) => ({
     url: `${siteUrl}/blog/${slug}`,
     lastModified: new Date(),
