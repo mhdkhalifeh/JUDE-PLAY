@@ -122,6 +122,15 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
 
   const totalPlays = games.reduce((sum, game) => sum + (game.plays || 0), 0);
 
+  const judeSpaceShooter =
+    games.find((game) => game.slug === "jude-space-shooter") || null;
+
+  const judeGameImage =
+    judeSpaceShooter?.image ||
+    "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1800&q=90";
+
+  const judeGameUrl = "https://jude-space-shooter.vercel.app";
+
   function GameCard({ game }: { game: any }) {
     const isFav = favorites.includes(game.slug);
 
@@ -185,81 +194,160 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
 
   return (
     <div className="min-h-screen bg-[#070914] text-white">
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative isolate min-h-[680px] overflow-hidden border-b border-white/10">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{
-            backgroundImage:
-              "url(https://images.template.net/376680/Neon-Gaming-Background-edit-online-1.jpg)",
-          }}
+          className="absolute inset-0 scale-105 bg-cover bg-center"
+          style={{ backgroundImage: `url(${judeGameImage})` }}
         />
 
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(34,197,94,0.18),transparent_34%),radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.2),transparent_32%)]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/90 to-[#020617]/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#070914] via-transparent to-black/20" />
 
-        <div className="relative z-10 mx-auto max-w-7xl px-8 py-12">
-          <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
-            JUDE PLAY
-          </p>
+        <div className="absolute left-[12%] top-24 h-2 w-2 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_18px_6px_rgba(103,232,249,.75)]" />
+        <div className="absolute left-[38%] top-44 h-1.5 w-1.5 animate-pulse rounded-full bg-white shadow-[0_0_14px_5px_rgba(255,255,255,.55)]" />
+        <div className="absolute right-[20%] top-28 h-2 w-2 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_18px_6px_rgba(110,231,183,.65)]" />
 
-          <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight md:text-6xl">
-            The Future Of Browser Gaming
-          </h1>
+        <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl items-center px-6 py-20 md:px-8">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-black uppercase tracking-[0.22em] text-emerald-300 backdrop-blur">
+                JUDE ORIGINAL
+              </span>
 
-          <p className="mt-4 max-w-2xl text-lg text-slate-300">
-            Play instantly. No downloads. Just games.
-          </p>
+              <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-black uppercase tracking-[0.22em] text-cyan-300 backdrop-blur">
+                New Release
+              </span>
+            </div>
 
-          <div className="mt-7 flex flex-wrap gap-4">
-            {games[0] && (
-              <Link href={`/game/${games[0].slug}`}>
-                <button className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 py-3 text-base font-black shadow-[0_0_30px_rgba(168,85,247,.35)]">
-                  ▶ Play Now
-                </button>
-              </Link>
-            )}
+            <p className="mt-7 font-bold uppercase tracking-[0.38em] text-cyan-300">
+              JUDE GAME STUDIO PRESENTS
+            </p>
 
-            <a href="#games">
-              <button className="rounded-2xl border border-white/10 bg-white/5 px-7 py-3 text-base hover:bg-white/10">
-                Browse Games
-              </button>
-            </a>
+            <h1 className="mt-4 text-5xl font-black leading-[0.95] tracking-tight md:text-7xl lg:text-8xl">
+              JUDE
+              <span className="block bg-gradient-to-r from-cyan-300 via-emerald-300 to-lime-300 bg-clip-text text-transparent">
+                SPACE SHOOTER
+              </span>
+            </h1>
+
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-200 md:text-xl">
+              Fight through endless enemy waves, destroy colossal bosses,
+              collect powerful upgrades and survive the war beyond the stars.
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3 text-sm font-bold text-slate-300">
+              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
+                ⚡ Infinite Stages
+              </span>
+              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
+                👾 Epic Boss Battles
+              </span>
+              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
+                📱 Desktop & Mobile
+              </span>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-4">
+              <a
+                href={judeGameUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-lg font-black text-slate-950 shadow-[0_0_40px_rgba(34,211,238,.38)] transition hover:-translate-y-1 hover:scale-[1.02]"
+              >
+                <span className="text-2xl transition group-hover:translate-x-1">▶</span>
+                PLAY NOW
+              </a>
+
+              <a
+                href="#jude-promo"
+                className="inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-lg font-black backdrop-blur transition hover:-translate-y-1 hover:bg-white/10"
+              >
+                🎬 WATCH PROMO
+              </a>
+            </div>
+
+            <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
+              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
+                <p className="text-xs uppercase tracking-wider text-slate-400">Plays</p>
+                <p className="mt-1 text-2xl font-black">
+                  {judeSpaceShooter?.plays || 0}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
+                <p className="text-xs uppercase tracking-wider text-slate-400">Rating</p>
+                <p className="mt-1 text-2xl font-black text-yellow-300">
+                  ⭐ {judeSpaceShooter?.rating || "5.0"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
+                <p className="text-xs uppercase tracking-wider text-slate-400">Access</p>
+                <p className="mt-1 text-2xl font-black text-emerald-300">FREE</p>
+              </div>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="mt-7 grid max-w-2xl grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-              <p className="text-xs text-slate-400">Games</p>
-              <p className="mt-1 text-2xl font-black">{games.length}</p>
-            </div>
+      <section id="jude-promo" className="mx-auto max-w-7xl px-6 py-10 md:px-8">
+        <div className="relative overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-gradient-to-br from-slate-950 via-emerald-950/40 to-slate-950 p-1 shadow-[0_0_70px_rgba(34,211,238,.12)]">
+          <div className="relative overflow-hidden rounded-[1.8rem] px-6 py-10 md:px-10">
+            <div
+              className="absolute inset-0 bg-cover bg-center opacity-20"
+              style={{ backgroundImage: `url(${judeGameImage})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/45" />
 
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-              <p className="text-xs text-slate-400">Plays</p>
-              <p className="mt-1 text-2xl font-black">{totalPlays}</p>
-            </div>
+            <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.25fr_.75fr]">
+              <div>
+                <p className="font-black uppercase tracking-[0.32em] text-emerald-300">
+                  Official JUDE Play Original
+                </p>
 
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
-              <p className="text-xs text-slate-400">Categories</p>
-              <p className="mt-1 text-2xl font-black">
-                {categories.length - 1}
-              </p>
+                <h2 className="mt-3 text-4xl font-black md:text-5xl">
+                  Enter the battlefield.
+                  <span className="block text-cyan-300">Defeat the impossible.</span>
+                </h2>
+
+                <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+                  Three unique worlds, massive boss encounters, evolving weapons,
+                  shields, power-ups and endless stages built exclusively by
+                  JUDE GAME STUDIO.
+                </p>
+
+                <div className="mt-7 flex flex-wrap gap-3">
+                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-slate-200">
+                    ALPHA DREADNOUGHT
+                  </span>
+                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-violet-200">
+                    OMEGA SIEGE CRUISER
+                  </span>
+                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-emerald-200">
+                    LEVIATHAN NEBULA BEAST
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex justify-center lg:justify-end">
+                <a
+                  href={judeGameUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex h-56 w-full max-w-sm flex-col items-center justify-center rounded-3xl border border-cyan-300/25 bg-black/45 text-center backdrop-blur transition hover:-translate-y-2 hover:border-cyan-300/60 hover:shadow-[0_0_45px_rgba(34,211,238,.25)]"
+                >
+                  <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 text-4xl text-slate-950 shadow-[0_0_35px_rgba(34,211,238,.45)] transition group-hover:scale-110">
+                    ▶
+                  </span>
+                  <span className="mt-5 text-2xl font-black">PLAY THE ORIGINAL</span>
+                  <span className="mt-2 text-sm text-slate-400">
+                    Launches instantly in your browser
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
-
-         <input
-  value={query}
-  onChange={(e) => {
-    setQuery(e.target.value);
-    setCurrentPage(1);
-  }}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      document.getElementById("games")?.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }}
-  placeholder="Search for games..."
-  className="mt-4 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-3 text-base outline-none backdrop-blur focus:border-fuchsia-500"
-/>
         </div>
       </section>
 
