@@ -44,7 +44,6 @@ export default function HomeClient({
   const [games] = useState<any[]>(initialGames);
   const [recentlyPlayed, setRecentlyPlayed] = useState<any[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
-
   const [query, setQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
@@ -159,29 +158,14 @@ export default function HomeClient({
 
     return (
       <Link href={`/game/${game.slug}`} className="block h-full">
-        <article
-          className="
-            group h-full overflow-hidden
-            rounded-[20px]
-            border border-white/[0.08]
-            bg-[#0a0e19]
-            transition-all duration-300
-            hover:-translate-y-1
-            hover:border-purple-400/30
-            hover:shadow-[0_20px_50px_rgba(0,0,0,.45)]
-          "
-        >
+        <article className="group h-full overflow-hidden rounded-[20px] border border-white/[0.08] bg-[#0a0e19] transition-all duration-300 hover:-translate-y-1 hover:border-purple-400/30 hover:shadow-[0_20px_50px_rgba(0,0,0,.45)]">
           <div className="relative aspect-[16/10] overflow-hidden bg-[#101522]">
             {game.image ? (
               <img
                 src={game.image}
                 alt={game.title}
                 loading="lazy"
-                className="
-                  h-full w-full object-cover
-                  transition-transform duration-500
-                  group-hover:scale-105
-                "
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
               <div className="flex h-full items-center justify-center text-slate-600">
@@ -198,17 +182,11 @@ export default function HomeClient({
                 e.stopPropagation();
                 toggleFavorite(game.slug);
               }}
-              className={`
-                absolute right-3 top-3 z-20
-                flex h-9 w-9 items-center justify-center
-                rounded-full border border-white/10
-                backdrop-blur-md transition
-                ${
-                  isFav
-                    ? "bg-pink-500 text-white"
-                    : "bg-black/50 text-white hover:bg-pink-500"
-                }
-              `}
+              className={`absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 backdrop-blur-md transition ${
+                isFav
+                  ? "bg-pink-500 text-white"
+                  : "bg-black/50 text-white hover:bg-pink-500"
+              }`}
             >
               ♥
             </button>
@@ -240,68 +218,25 @@ export default function HomeClient({
 
   return (
     <main className="min-h-screen bg-[#040711] text-white">
-      {/* =========================================================
-          HERO
-      ========================================================= */}
-
+      {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/[0.07]">
-        {/* Background */}
         <div className="absolute inset-0 bg-[#050815]" />
 
-        <div
-          className="
-            absolute right-[-10%] top-[-35%]
-            h-[800px] w-[800px]
-            rounded-full
-            bg-violet-700/20
-            blur-[130px]
-          "
-        />
+        <div className="absolute right-[-10%] top-[-35%] h-[800px] w-[800px] rounded-full bg-violet-700/20 blur-[130px]" />
+        <div className="absolute right-[20%] top-[15%] h-[500px] w-[500px] rounded-full bg-cyan-500/10 blur-[130px]" />
+        <div className="absolute left-[-20%] bottom-[-60%] h-[700px] w-[700px] rounded-full bg-fuchsia-700/10 blur-[150px]" />
 
-        <div
-          className="
-            absolute right-[20%] top-[15%]
-            h-[500px] w-[500px]
-            rounded-full
-            bg-cyan-500/10
-            blur-[130px]
-          "
-        />
-
-        <div
-          className="
-            absolute left-[-20%] bottom-[-60%]
-            h-[700px] w-[700px]
-            rounded-full
-            bg-fuchsia-700/10
-            blur-[150px]
-          "
-        />
-
-        {/* subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.12]"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.07) 1px, transparent 1px)",
             backgroundSize: "70px 70px",
-            maskImage:
-              "linear-gradient(to right, black, transparent 65%)",
+            maskImage: "linear-gradient(to right, black, transparent 70%)",
           }}
         />
 
-        <div
-          className="
-            relative z-10 mx-auto
-            grid min-h-[590px]
-            w-full max-w-[1450px]
-            items-center gap-10
-            px-5 py-14
-            sm:px-8
-            lg:grid-cols-[0.88fr_1.12fr]
-            lg:px-12
-          "
-        >
+        <div className="relative z-10 mx-auto grid min-h-[620px] w-full max-w-[1450px] items-center gap-12 px-5 py-14 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-12">
           {/* LEFT */}
           <div className="relative z-10">
             <p className="text-xs font-black uppercase tracking-[0.35em] text-cyan-400">
@@ -316,42 +251,21 @@ export default function HomeClient({
               <span className="text-yellow-400">★</span>
             </div>
 
-            <h1
-              className="
-                mt-4 max-w-[650px]
-                text-[48px] font-black
-                uppercase leading-[0.88]
-                tracking-[-0.05em]
-                sm:text-[64px]
-                lg:text-[78px]
-              "
-            >
+            <h1 className="mt-4 max-w-[650px] text-[48px] font-black uppercase leading-[0.88] tracking-[-0.05em] sm:text-[64px] lg:text-[78px]">
               <span className="block text-white">JUDE</span>
 
-              <span
-                className="
-                  block bg-gradient-to-r
-                  from-cyan-300 via-blue-500 to-fuchsia-500
-                  bg-clip-text text-transparent
-                "
-              >
+              <span className="block bg-gradient-to-r from-cyan-300 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent">
                 SPACE
               </span>
 
-              <span
-                className="
-                  block bg-gradient-to-r
-                  from-fuchsia-400 via-purple-500 to-pink-500
-                  bg-clip-text text-transparent
-                "
-              >
+              <span className="block bg-gradient-to-r from-fuchsia-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                 SHOOTER
               </span>
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-7 text-slate-300">
-              The ultimate space battle begins now. Fight enemy waves,
-              upgrade your ship and survive the Nova Legion.
+              The ultimate space battle begins now. Fight enemy waves, upgrade
+              your ship and survive the Nova Legion.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -359,20 +273,7 @@ export default function HomeClient({
                 href={SPACE_SHOOTER_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-                  inline-flex min-w-[175px]
-                  items-center justify-center gap-3
-                  rounded-xl
-                  bg-gradient-to-r
-                  from-fuchsia-600 via-purple-600 to-cyan-400
-                  px-7 py-4
-                  text-sm font-black
-                  text-white
-                  shadow-[0_12px_40px_rgba(168,85,247,.30)]
-                  transition
-                  hover:scale-[1.03]
-                  hover:shadow-[0_15px_50px_rgba(34,211,238,.30)]
-                "
+                className="inline-flex min-w-[175px] items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-fuchsia-600 via-purple-600 to-cyan-400 px-7 py-4 text-sm font-black text-white shadow-[0_12px_40px_rgba(168,85,247,.30)] transition hover:scale-[1.03]"
               >
                 PLAY NOW
                 <span>▶</span>
@@ -380,16 +281,7 @@ export default function HomeClient({
 
               <button
                 onClick={scrollToGames}
-                className="
-                  min-w-[155px]
-                  rounded-xl
-                  border border-white/20
-                  bg-black/20
-                  px-7 py-4
-                  text-sm font-bold
-                  backdrop-blur
-                  transition hover:bg-white/10
-                "
+                className="min-w-[155px] rounded-xl border border-white/20 bg-black/20 px-7 py-4 text-sm font-bold backdrop-blur transition hover:bg-white/10"
               >
                 Browse Games
               </button>
@@ -417,86 +309,69 @@ export default function HomeClient({
             </div>
           </div>
 
-          {/* RIGHT - GAME VISUAL */}
-          <div className="relative hidden min-h-[500px] lg:block">
-            <div className="absolute left-[50%] top-[46%] h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-400/15" />
-            <div className="absolute left-[50%] top-[46%] h-[320px] w-[320px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-purple-400/20" />
-            <div className="absolute left-[50%] top-[46%] h-[220px] w-[220px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-500/10 blur-3xl" />
+          {/* RIGHT - SPACE SHOOTER VISUAL */}
+          <div className="relative hidden min-h-[520px] lg:block">
+            <div className="absolute left-[45%] top-[50%] h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-500/10 blur-[130px]" />
+            <div className="absolute right-[0%] top-[12%] h-[420px] w-[420px] rounded-full bg-fuchsia-600/10 blur-[130px]" />
 
-            <div
-              className="
-                absolute left-[50%] top-[46%]
-                -translate-x-1/2 -translate-y-1/2
-                text-center
-              "
+            <a
+              href={SPACE_SHOOTER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group absolute inset-0 flex items-center justify-center"
             >
-              <div
-                className="
-                  mx-auto flex h-[210px] w-[210px]
-                  rotate-45 items-center justify-center
-                  rounded-[40px]
-                  border border-cyan-300/30
-                  bg-gradient-to-br
-                  from-cyan-400/10
-                  via-purple-500/20
-                  to-fuchsia-500/10
-                  shadow-[0_0_80px_rgba(79,70,229,.35)]
-                  backdrop-blur
-                "
-              >
-                <div className="-rotate-45 text-center">
+              <div className="relative w-full max-w-[760px] overflow-hidden rounded-[30px] border border-white/10 bg-black/30 shadow-[0_40px_100px_rgba(0,0,0,.55)] transition-all duration-500 group-hover:-translate-y-1 group-hover:scale-[1.01] group-hover:border-cyan-400/30">
+                <div className="relative aspect-[16/10] overflow-hidden">
                   <img
-  src="/images/jude-space-shooter.webp"
-  alt="JUDE Space Shooter"
-  className="h-full w-full object-cover"
-/>
-                  <p className="mt-4 text-xs font-black uppercase tracking-[0.25em] text-cyan-300">
-                    JUDE VANGUARD
-                  </p>
+                    src="/images/jude-space-shooter.webp"
+                    alt="JUDE Space Shooter"
+                    className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#040711] via-transparent to-black/15" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-transparent to-transparent" />
+
+                  <div className="absolute left-5 top-5">
+                    <span className="rounded-full border border-cyan-400/20 bg-black/45 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300 backdrop-blur-md">
+                      JUDE ORIGINAL
+                    </span>
+                  </div>
+
+                  <div className="absolute right-5 top-5 rounded-full border border-white/10 bg-black/45 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white backdrop-blur-md">
+                    SPACE COMBAT
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <div className="flex items-end justify-between gap-6">
+                      <div>
+                        <p className="text-xs font-black uppercase tracking-[0.25em] text-cyan-300">
+                          NOW PLAYING
+                        </p>
+
+                        <h2 className="mt-2 text-3xl font-black tracking-tight text-white">
+                          JUDE Space Shooter
+                        </h2>
+
+                        <p className="mt-2 max-w-md text-sm text-slate-300">
+                          Enter the battle and survive the Nova Legion.
+                        </p>
+                      </div>
+
+                      <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 to-cyan-400 text-lg font-black text-white shadow-[0_10px_30px_rgba(34,211,238,.25)] transition group-hover:scale-110">
+                        ▶
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="absolute left-[10%] top-[17%] h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_20px_#22d3ee]" />
-            <div className="absolute right-[15%] top-[23%] h-2 w-2 rounded-full bg-pink-400 shadow-[0_0_20px_#f472b6]" />
-            <div className="absolute right-[23%] bottom-[19%] h-1.5 w-1.5 rounded-full bg-purple-300 shadow-[0_0_18px_#c4b5fd]" />
-            <div className="absolute left-[22%] bottom-[28%] h-1.5 w-1.5 rounded-full bg-blue-300 shadow-[0_0_18px_#93c5fd]" />
-
-            <div
-              className="
-                absolute bottom-12 left-1/2
-                -translate-x-1/2
-                rounded-full
-                border border-white/10
-                bg-black/30
-                px-5 py-2
-                text-[10px] font-black
-                uppercase tracking-[0.25em]
-                text-slate-400
-                backdrop-blur
-              "
-            >
-              ORIGINAL JUDE GAME
-            </div>
+            </a>
           </div>
         </div>
       </section>
 
-      {/* =========================================================
-          SEARCH
-      ========================================================= */}
-
+      {/* SEARCH */}
       <div className="relative z-20 mx-auto -mt-7 w-full max-w-[1180px] px-5 sm:px-8">
-        <div
-          className="
-            rounded-2xl
-            border border-white/10
-            bg-[#0a0e19]/95
-            p-2
-            shadow-[0_20px_60px_rgba(0,0,0,.45)]
-            backdrop-blur-xl
-          "
-        >
+        <div className="rounded-2xl border border-white/10 bg-[#0a0e19]/95 p-2 shadow-[0_20px_60px_rgba(0,0,0,.45)] backdrop-blur-xl">
           <div className="flex h-14 items-center gap-3 rounded-xl bg-black/30 px-5">
             <span className="text-lg text-slate-600">⌕</span>
 
@@ -519,23 +394,10 @@ export default function HomeClient({
       </div>
 
       <div className="mx-auto w-full max-w-[1450px] px-5 py-16 sm:px-8 lg:px-12">
-        {/* =======================================================
-            JUDE ORIGINALS
-        ======================================================= */}
-
+        {/* JUDE ORIGINALS */}
         {query.trim() === "" && selectedCategory === "All" && (
           <section className="mb-16">
-            <div
-              className="
-                rounded-[26px]
-                border border-white/[0.08]
-                bg-gradient-to-br
-                from-[#080c17]
-                via-[#080b15]
-                to-[#090815]
-                p-5 sm:p-7
-              "
-            >
+            <div className="rounded-[26px] border border-white/[0.08] bg-gradient-to-br from-[#080c17] via-[#080b15] to-[#090815] p-5 sm:p-7">
               <div className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-400">
@@ -551,70 +413,42 @@ export default function HomeClient({
                   </p>
                 </div>
 
-                <div
-                  className="
-                    flex w-fit items-center gap-2
-                    rounded-full border border-white/10
-                    bg-white/[0.03]
-                    px-4 py-2
-                    text-[10px] font-bold
-                    text-slate-400
-                  "
-                >
+                <div className="flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-[10px] font-bold text-slate-400">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#34d399]" />
                   EXCLUSIVE ON JUDE PLAY
                 </div>
               </div>
 
               <div className="grid gap-5 lg:grid-cols-2">
-                {/* SPACE SHOOTER */}
+                {/* SPACE SHOOTER CARD */}
                 <a
                   href={SPACE_SHOOTER_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="
-                    group relative min-h-[410px]
-                    overflow-hidden rounded-[22px]
-                    border border-purple-400/20
-                    bg-[#060915]
-                    transition duration-300
-                    hover:-translate-y-1
-                    hover:border-purple-400/50
-                  "
+                  className="group relative min-h-[430px] overflow-hidden rounded-[22px] border border-purple-400/20 bg-[#060915] transition duration-300 hover:-translate-y-1 hover:border-purple-400/50"
                 >
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_40%,rgba(37,99,235,.25),transparent_30%),radial-gradient(circle_at_55%_20%,rgba(168,85,247,.18),transparent_35%)]" />
+                  <img
+                    src="/images/jude-space-shooter.webp"
+                    alt="JUDE Space Shooter"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
 
-                  <div className="absolute right-[-20px] top-[40px] h-[300px] w-[300px] rounded-full border border-cyan-400/10" />
-                  <div className="absolute right-[40px] top-[100px] h-[180px] w-[180px] rounded-full border border-purple-400/20" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050812] via-[#050812]/50 to-black/10" />
 
                   <div className="absolute left-5 top-5">
-                    <span
-                      className="
-                        rounded-full
-                        border border-cyan-400/20
-                        bg-cyan-400/10
-                        px-3 py-2
-                        text-[10px] font-black
-                        uppercase tracking-[0.2em]
-                        text-cyan-300
-                      "
-                    >
+                    <span className="rounded-full border border-cyan-400/20 bg-black/45 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300 backdrop-blur">
                       JUDE ORIGINAL
                     </span>
                   </div>
 
-                  <div className="absolute right-[12%] top-[27%] text-[80px] opacity-80 transition-transform duration-500 group-hover:scale-110">
-                    🚀
+                  <div className="absolute right-5 top-5">
+                    <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-500/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-fuchsia-200 backdrop-blur">
+                      FEATURED
+                    </span>
                   </div>
 
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#050812] via-[#050812]/90 to-transparent p-6 pt-24">
-                    <h3
-                      className="
-                        max-w-md text-4xl font-black
-                        uppercase leading-[0.9]
-                        tracking-[-0.04em]
-                      "
-                    >
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#050812] via-[#050812]/95 to-transparent p-6 pt-28">
+                    <h3 className="max-w-md text-4xl font-black uppercase leading-[0.9] tracking-[-0.04em]">
                       <span className="block text-white">JUDE</span>
 
                       <span className="block bg-gradient-to-r from-cyan-300 via-blue-400 to-fuchsia-400 bg-clip-text text-transparent">
@@ -622,22 +456,13 @@ export default function HomeClient({
                       </span>
                     </h3>
 
-                    <p className="mt-4 max-w-md text-sm leading-6 text-slate-400">
+                    <p className="mt-4 max-w-md text-sm leading-6 text-slate-300">
                       Fight enemies, upgrade your ship and survive the ultimate
                       JUDE space battle.
                     </p>
 
                     <div className="mt-5">
-                      <span
-                        className="
-                          inline-flex items-center gap-3
-                          rounded-xl
-                          bg-gradient-to-r from-fuchsia-600 to-cyan-400
-                          px-5 py-3
-                          text-xs font-black
-                          text-white
-                        "
-                      >
+                      <span className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-fuchsia-600 to-cyan-400 px-5 py-3 text-xs font-black text-white">
                         PLAY NOW
                         <span>→</span>
                       </span>
@@ -649,63 +474,31 @@ export default function HomeClient({
                 {lahza ? (
                   <Link
                     href={`/game/${lahza.slug}`}
-                    className="
-                      group relative min-h-[410px]
-                      overflow-hidden rounded-[22px]
-                      border border-cyan-400/20
-                      bg-[#061014]
-                      transition duration-300
-                      hover:-translate-y-1
-                      hover:border-cyan-400/50
-                    "
+                    className="group relative min-h-[430px] overflow-hidden rounded-[22px] border border-cyan-400/20 bg-[#061014] transition duration-300 hover:-translate-y-1 hover:border-cyan-400/50"
                   >
                     {lahza.image && (
                       <img
                         src={lahza.image}
                         alt={lahza.title}
-                        className="
-                          absolute inset-0 h-full w-full object-cover
-                          transition-transform duration-700
-                          group-hover:scale-105
-                        "
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                     )}
 
                     <div className="absolute inset-0 bg-gradient-to-t from-[#041012] via-black/25 to-black/10" />
 
                     <div className="absolute left-5 top-5">
-                      <span
-                        className="
-                          rounded-full
-                          border border-cyan-400/20
-                          bg-cyan-400/10
-                          px-3 py-2
-                          text-[10px] font-black
-                          uppercase tracking-[0.2em]
-                          text-cyan-300
-                          backdrop-blur
-                        "
-                      >
+                      <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-300 backdrop-blur">
                         JUDE ORIGINAL
                       </span>
                     </div>
 
                     <div className="absolute right-5 top-5">
-                      <span
-                        className="
-                          rounded-full
-                          bg-emerald-400
-                          px-4 py-2
-                          text-[10px] font-black
-                          uppercase tracking-[0.15em]
-                          text-black
-                        "
-                      >
+                      <span className="rounded-full bg-emerald-400 px-4 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-black">
                         NEW
                       </span>
                     </div>
 
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#041012] via-[#041012]/95 to-transparent p-6 pt-24">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#041012] via-[#041012]/95 to-transparent p-6 pt-28">
                       <h3 className="text-3xl font-black md:text-4xl">
                         {lahza.title}
                       </h3>
@@ -717,16 +510,7 @@ export default function HomeClient({
                       </p>
 
                       <div className="mt-5">
-                        <span
-                          className="
-                            inline-flex items-center gap-3
-                            rounded-xl
-                            bg-gradient-to-r from-emerald-300 to-cyan-400
-                            px-5 py-3
-                            text-xs font-black
-                            text-black
-                          "
-                        >
+                        <span className="inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-emerald-300 to-cyan-400 px-5 py-3 text-xs font-black text-black">
                           PLAY NOW
                           <span>→</span>
                         </span>
@@ -734,18 +518,8 @@ export default function HomeClient({
                     </div>
                   </Link>
                 ) : (
-                  <div
-                    className="
-                      flex min-h-[410px]
-                      items-center justify-center
-                      rounded-[22px]
-                      border border-white/10
-                      bg-[#080c14]
-                    "
-                  >
-                    <p className="text-slate-500">
-                      LAHZA will appear here.
-                    </p>
+                  <div className="flex min-h-[430px] items-center justify-center rounded-[22px] border border-white/10 bg-[#080c14]">
+                    <p className="text-slate-500">LAHZA will appear here.</p>
                   </div>
                 )}
               </div>
@@ -753,50 +527,29 @@ export default function HomeClient({
           </section>
         )}
 
-        {/* =======================================================
-            TRENDING
-        ======================================================= */}
-
+        {/* TRENDING */}
         <section className="mb-16">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-fuchsia-400">
-                TRENDING NOW
-              </p>
+          <div className="mb-6">
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-fuchsia-400">
+              TRENDING NOW
+            </p>
 
-              <h2 className="mt-2 text-3xl font-black">
-                Popular games right now
-              </h2>
-            </div>
+            <h2 className="mt-2 text-3xl font-black">
+              Popular games right now
+            </h2>
           </div>
 
-          <div
-            className="
-              grid grid-cols-1 gap-5
-              sm:grid-cols-2
-              lg:grid-cols-3
-              xl:grid-cols-6
-            "
-          >
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             {trendingGames.map((game) => (
               <GameCard key={game.id} game={game} />
             ))}
           </div>
         </section>
 
-        {/* =======================================================
-            BROWSE / ALL GAMES
-        ======================================================= */}
-
+        {/* BROWSE */}
         <section
           id="games"
-          className="
-            scroll-mt-24
-            rounded-[26px]
-            border border-white/[0.08]
-            bg-[#080c16]
-            p-5 sm:p-7
-          "
+          className="scroll-mt-24 rounded-[26px] border border-white/[0.08] bg-[#080c16] p-5 sm:p-7"
         >
           <p className="text-xs font-black uppercase tracking-[0.3em] text-cyan-400">
             BROWSE BY CATEGORY
@@ -810,16 +563,11 @@ export default function HomeClient({
                   setSelectedCategory(category);
                   setCurrentPage(1);
                 }}
-                className={`
-                  rounded-full px-5 py-2.5
-                  text-xs font-bold
-                  transition
-                  ${
-                    selectedCategory === category
-                      ? "bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white shadow-[0_8px_25px_rgba(168,85,247,.25)]"
-                      : "border border-white/10 bg-[#0c111d] text-slate-400 hover:bg-white/[0.07] hover:text-white"
-                  }
-                `}
+                className={`rounded-full px-5 py-2.5 text-xs font-bold transition ${
+                  selectedCategory === category
+                    ? "bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white shadow-[0_8px_25px_rgba(168,85,247,.25)]"
+                    : "border border-white/10 bg-[#0c111d] text-slate-400 hover:bg-white/[0.07] hover:text-white"
+                }`}
               >
                 {category}
               </button>
@@ -841,14 +589,7 @@ export default function HomeClient({
           </div>
 
           {paginatedGames.length > 0 ? (
-            <div
-              className="
-                grid grid-cols-1 gap-5
-                sm:grid-cols-2
-                lg:grid-cols-3
-                xl:grid-cols-6
-              "
-            >
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
               {paginatedGames.map((game) => (
                 <GameCard key={game.id} game={game} />
               ))}
@@ -856,7 +597,6 @@ export default function HomeClient({
           ) : (
             <div className="py-20 text-center">
               <p className="text-xl font-black">No games found</p>
-
               <p className="mt-2 text-sm text-slate-500">
                 Try another search or category.
               </p>
@@ -871,14 +611,7 @@ export default function HomeClient({
                   setCurrentPage((prev) => prev - 1);
                   scrollToGames();
                 }}
-                className="
-                  rounded-xl
-                  border border-white/10
-                  bg-white/[0.04]
-                  px-4 py-2
-                  text-sm
-                  disabled:opacity-30
-                "
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-30"
               >
                 ← Prev
               </button>
@@ -895,15 +628,11 @@ export default function HomeClient({
                       setCurrentPage(page);
                       scrollToGames();
                     }}
-                    className={`
-                      min-w-10 rounded-xl px-3 py-2
-                      text-sm font-bold
-                      ${
-                        currentPage === page
-                          ? "bg-purple-600 text-white"
-                          : "border border-white/10 bg-white/[0.04] text-slate-400"
-                      }
-                    `}
+                    className={`min-w-10 rounded-xl px-3 py-2 text-sm font-bold ${
+                      currentPage === page
+                        ? "bg-purple-600 text-white"
+                        : "border border-white/10 bg-white/[0.04] text-slate-400"
+                    }`}
                   >
                     {page}
                   </button>
@@ -915,14 +644,7 @@ export default function HomeClient({
                   setCurrentPage((prev) => prev + 1);
                   scrollToGames();
                 }}
-                className="
-                  rounded-xl
-                  border border-white/10
-                  bg-white/[0.04]
-                  px-4 py-2
-                  text-sm
-                  disabled:opacity-30
-                "
+                className="rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2 text-sm disabled:opacity-30"
               >
                 Next →
               </button>
@@ -931,10 +653,7 @@ export default function HomeClient({
         </section>
       </div>
 
-      {/* =========================================================
-          RECENTLY PLAYED
-      ========================================================= */}
-
+      {/* RECENTLY PLAYED */}
       {recentlyPlayed.length > 0 && (
         <section className="border-t border-white/[0.06] bg-[#060913]">
           <div className="mx-auto w-full max-w-[1450px] px-5 py-14 sm:px-8 lg:px-12">
@@ -942,9 +661,7 @@ export default function HomeClient({
               CONTINUE PLAYING
             </p>
 
-            <h2 className="mt-2 text-3xl font-black">
-              Recently Played
-            </h2>
+            <h2 className="mt-2 text-3xl font-black">Recently Played</h2>
 
             <div className="mt-7 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {recentlyPlayed.map((game) => (
@@ -955,23 +672,10 @@ export default function HomeClient({
         </section>
       )}
 
-      {/* =========================================================
-          FOOTER ABOUT
-      ========================================================= */}
-
+      {/* ABOUT */}
       <section className="border-t border-white/[0.06]">
         <div className="mx-auto w-full max-w-[1450px] px-5 py-14 sm:px-8 lg:px-12">
-          <div
-            className="
-              grid gap-8
-              rounded-[24px]
-              border border-white/[0.07]
-              bg-[#080c15]
-              p-7
-              md:grid-cols-[0.7fr_1.3fr]
-              md:p-9
-            "
-          >
+          <div className="grid gap-8 rounded-[24px] border border-white/[0.07] bg-[#080c15] p-7 md:grid-cols-[0.7fr_1.3fr] md:p-9">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.3em] text-fuchsia-400">
                 JUDE PLAY
@@ -987,8 +691,8 @@ export default function HomeClient({
             <div className="space-y-4 text-sm leading-7 text-slate-400">
               <p>
                 JUDE Play is a free online gaming platform with hundreds of
-                browser games across action, puzzle, racing, arcade,
-                adventure and more.
+                browser games across action, puzzle, racing, arcade, adventure
+                and more.
               </p>
 
               <p>
