@@ -111,25 +111,42 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
 
   const paginatedGames = filteredGames.slice(
     (currentPage - 1) * gamesPerPage,
-    currentPage * gamesPerPage
+    currentPage * gamesPerPage,
   );
 
   const trendingGames = [...games]
     .sort((a, b) => (b.plays || 0) - (a.plays || 0))
     .slice(0, 8);
 
-  const featuredGames = trendingGames.slice(0, 3);
+  // Keep JUDE's original games permanently featured, regardless of play count.
+  const judeOriginalGames = [...games]
+    .filter((game) => {
+      const slug = String(game.slug || "").toLowerCase();
+      const title = String(game.title || "").toLowerCase();
+
+      return (
+        slug.includes("jude-space-shooter") ||
+        slug.includes("lahza") ||
+        title.includes("jude space shooter") ||
+        title.includes("لحظة")
+      );
+    })
+    .sort((a, b) => {
+      const priority = (game: any) => {
+        const text = `${game.slug || ""} ${game.title || ""}`.toLowerCase();
+        if (text.includes("lahza") || text.includes("لحظة")) return 0;
+        if (
+          text.includes("jude-space-shooter") ||
+          text.includes("jude space shooter")
+        )
+          return 1;
+        return 2;
+      };
+
+      return priority(a) - priority(b);
+    });
 
   const totalPlays = games.reduce((sum, game) => sum + (game.plays || 0), 0);
-
-  const judeSpaceShooter =
-    games.find((game) => game.slug === "jude-space-shooter") || null;
-
-  const judeGameImage =
-    judeSpaceShooter?.image ||
-    "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=1800&q=90";
-
-  const judeGameUrl = "https://jude-space-shooter.vercel.app";
 
   function GameCard({ game }: { game: any }) {
     const isFav = favorites.includes(game.slug);
@@ -194,226 +211,226 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
 
   return (
     <div className="min-h-screen bg-[#070914] text-white">
-      <section className="relative isolate min-h-[680px] overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div
-          className="absolute inset-0 scale-105 bg-cover bg-center"
-          style={{ backgroundImage: `url(${judeGameImage})` }}
+          className="absolute inset-0 bg-cover bg-center opacity-30"
+          style={{
+            backgroundImage:
+              "url(https://images.template.net/376680/Neon-Gaming-Background-edit-online-1.jpg)",
+          }}
         />
 
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_45%,rgba(34,197,94,0.18),transparent_34%),radial-gradient(circle_at_20%_20%,rgba(56,189,248,0.2),transparent_32%)]" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#020617] via-[#020617]/90 to-[#020617]/25" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#070914] via-transparent to-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent" />
 
-        <div className="absolute left-[12%] top-24 h-2 w-2 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_18px_6px_rgba(103,232,249,.75)]" />
-        <div className="absolute left-[38%] top-44 h-1.5 w-1.5 animate-pulse rounded-full bg-white shadow-[0_0_14px_5px_rgba(255,255,255,.55)]" />
-        <div className="absolute right-[20%] top-28 h-2 w-2 animate-pulse rounded-full bg-emerald-300 shadow-[0_0_18px_6px_rgba(110,231,183,.65)]" />
+        <div className="relative z-10 mx-auto max-w-7xl px-8 py-12">
+          <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
+            JUDE PLAY
+          </p>
 
-        <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl items-center px-6 py-20 md:px-8">
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-4 py-2 text-sm font-black uppercase tracking-[0.22em] text-emerald-300 backdrop-blur">
-                JUDE ORIGINAL
-              </span>
+          <h1 className="mt-3 max-w-4xl text-4xl font-black leading-tight md:text-6xl">
+            The Future Of Browser Gaming
+          </h1>
 
-              <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm font-black uppercase tracking-[0.22em] text-cyan-300 backdrop-blur">
-                New Release
-              </span>
+          <p className="mt-4 max-w-2xl text-lg text-slate-300">
+            Play instantly. No downloads. Just games.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-4">
+            {judeOriginalGames.slice(0, 2).map((game) => (
+              <Link key={game.id} href={`/game/${game.slug}`}>
+                <button className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 py-3 text-base font-black shadow-[0_0_30px_rgba(168,85,247,.35)]">
+                  ▶ {game.title}
+                </button>
+              </Link>
+            ))}
+
+            {judeOriginalGames.length === 0 && games[0] && (
+              <Link href={`/game/${games[0].slug}`}>
+                <button className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-7 py-3 text-base font-black shadow-[0_0_30px_rgba(168,85,247,.35)]">
+                  ▶ Play Now
+                </button>
+              </Link>
+            )}
+
+            <a href="#games">
+              <button className="rounded-2xl border border-white/10 bg-white/5 px-7 py-3 text-base hover:bg-white/10">
+                Browse Games
+              </button>
+            </a>
+          </div>
+
+          <div className="mt-7 grid max-w-2xl grid-cols-3 gap-3">
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Games</p>
+              <p className="mt-1 text-2xl font-black">{games.length}</p>
             </div>
 
-            <p className="mt-7 font-bold uppercase tracking-[0.38em] text-cyan-300">
-              JUDE GAME STUDIO PRESENTS
-            </p>
-
-            <h1 className="mt-4 text-5xl font-black leading-[0.95] tracking-tight md:text-7xl lg:text-8xl">
-              JUDE
-              <span className="block bg-gradient-to-r from-cyan-300 via-emerald-300 to-lime-300 bg-clip-text text-transparent">
-                SPACE SHOOTER
-              </span>
-            </h1>
-
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-slate-200 md:text-xl">
-              Fight through endless enemy waves, destroy colossal bosses,
-              collect powerful upgrades and survive the war beyond the stars.
-            </p>
-
-            <div className="mt-8 flex flex-wrap items-center gap-3 text-sm font-bold text-slate-300">
-              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
-                ⚡ Infinite Stages
-              </span>
-              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
-                👾 Epic Boss Battles
-              </span>
-              <span className="rounded-full border border-white/10 bg-black/35 px-4 py-2 backdrop-blur">
-                📱 Desktop & Mobile
-              </span>
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Plays</p>
+              <p className="mt-1 text-2xl font-black">{totalPlays}</p>
             </div>
 
-            <div className="mt-10 flex flex-wrap gap-4">
-              <a
-                href={judeGameUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="group inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-8 py-4 text-lg font-black text-slate-950 shadow-[0_0_40px_rgba(34,211,238,.38)] transition hover:-translate-y-1 hover:scale-[1.02]"
-              >
-                <span className="text-2xl transition group-hover:translate-x-1">▶</span>
-                PLAY NOW
-              </a>
-
-              <a
-                href="#jude-promo"
-                className="inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/5 px-8 py-4 text-lg font-black backdrop-blur transition hover:-translate-y-1 hover:bg-white/10"
-              >
-                🎬 WATCH PROMO
-              </a>
-            </div>
-
-            <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
-              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
-                <p className="text-xs uppercase tracking-wider text-slate-400">Plays</p>
-                <p className="mt-1 text-2xl font-black">
-                  {judeSpaceShooter?.plays || 0}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
-                <p className="text-xs uppercase tracking-wider text-slate-400">Rating</p>
-                <p className="mt-1 text-2xl font-black text-yellow-300">
-                  ⭐ {judeSpaceShooter?.rating || "5.0"}
-                </p>
-              </div>
-
-              <div className="rounded-2xl border border-white/10 bg-black/35 p-4 backdrop-blur">
-                <p className="text-xs uppercase tracking-wider text-slate-400">Access</p>
-                <p className="mt-1 text-2xl font-black text-emerald-300">FREE</p>
-              </div>
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-4 backdrop-blur">
+              <p className="text-xs text-slate-400">Categories</p>
+              <p className="mt-1 text-2xl font-black">
+                {categories.length - 1}
+              </p>
             </div>
           </div>
-        </div>
-      </section>
 
-      <section id="jude-promo" className="mx-auto max-w-7xl px-6 py-10 md:px-8">
-        <div className="relative overflow-hidden rounded-[2rem] border border-cyan-400/20 bg-gradient-to-br from-slate-950 via-emerald-950/40 to-slate-950 p-1 shadow-[0_0_70px_rgba(34,211,238,.12)]">
-          <div className="relative overflow-hidden rounded-[1.8rem] px-6 py-10 md:px-10">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-20"
-              style={{ backgroundImage: `url(${judeGameImage})` }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/45" />
-
-            <div className="relative z-10 grid items-center gap-8 lg:grid-cols-[1.25fr_.75fr]">
-              <div>
-                <p className="font-black uppercase tracking-[0.32em] text-emerald-300">
-                  Official JUDE Play Original
-                </p>
-
-                <h2 className="mt-3 text-4xl font-black md:text-5xl">
-                  Enter the battlefield.
-                  <span className="block text-cyan-300">Defeat the impossible.</span>
-                </h2>
-
-                <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-                  Three unique worlds, massive boss encounters, evolving weapons,
-                  shields, power-ups and endless stages built exclusively by
-                  JUDE GAME STUDIO.
-                </p>
-
-                <div className="mt-7 flex flex-wrap gap-3">
-                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-slate-200">
-                    ALPHA DREADNOUGHT
-                  </span>
-                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-violet-200">
-                    OMEGA SIEGE CRUISER
-                  </span>
-                  <span className="rounded-xl bg-white/5 px-4 py-3 text-sm font-bold text-emerald-200">
-                    LEVIATHAN NEBULA BEAST
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-center lg:justify-end">
-                <a
-                  href={judeGameUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex h-56 w-full max-w-sm flex-col items-center justify-center rounded-3xl border border-cyan-300/25 bg-black/45 text-center backdrop-blur transition hover:-translate-y-2 hover:border-cyan-300/60 hover:shadow-[0_0_45px_rgba(34,211,238,.25)]"
-                >
-                  <span className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 text-4xl text-slate-950 shadow-[0_0_35px_rgba(34,211,238,.45)] transition group-hover:scale-110">
-                    ▶
-                  </span>
-                  <span className="mt-5 text-2xl font-black">PLAY THE ORIGINAL</span>
-                  <span className="mt-2 text-sm text-slate-400">
-                    Launches instantly in your browser
-                  </span>
-                </a>
-              </div>
-            </div>
-          </div>
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setCurrentPage(1);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                document.getElementById("games")?.scrollIntoView({
+                  behavior: "smooth",
+                });
+              }
+            }}
+            placeholder="Search for games..."
+            className="mt-4 w-full max-w-2xl rounded-2xl border border-white/10 bg-black/50 px-6 py-3 text-base outline-none backdrop-blur focus:border-fuchsia-500"
+          />
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-8 py-10">
-{featuredGames.length > 0 && query.trim() === "" && selectedCategory === "All" && (          <section className="mb-14">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
-                  FEATURED
-                </p>
-                <h2 className="mt-2 text-4xl font-black">Featured Games</h2>
+        {judeOriginalGames.length > 0 &&
+          query.trim() === "" &&
+          selectedCategory === "All" && (
+            <section className="relative mb-16 overflow-hidden rounded-[2rem] border border-white/10 bg-[#090b18] px-5 py-8 shadow-[0_30px_100px_rgba(0,0,0,.45)] sm:px-8 lg:px-10">
+              <div className="pointer-events-none absolute -left-32 top-0 h-80 w-80 rounded-full bg-cyan-500/10 blur-[100px]" />
+              <div className="pointer-events-none absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-fuchsia-600/10 blur-[100px]" />
+
+              <div className="relative mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <div className="mb-3 flex items-center gap-3">
+                    <span className="h-px w-10 bg-gradient-to-r from-cyan-400 to-fuchsia-500" />
+                    <p className="text-xs font-black uppercase tracking-[0.35em] text-cyan-300 sm:text-sm">
+                      JUDE ORIGINALS
+                    </p>
+                  </div>
+
+                  <h2 className="text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
+                    Made by JUDE Game Studio
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">
+                    Original games built exclusively for JUDE Play. Play
+                    instantly on desktop or mobile.
+                  </p>
+                </div>
+
+                <div className="flex w-fit items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-bold text-slate-300 backdrop-blur">
+                  <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.9)]" />
+                  EXCLUSIVE ON JUDE PLAY
+                </div>
               </div>
 
-              <Link
-                href="/top-games"
-                className="rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300 hover:bg-white/10"
-              >
-                View Top Games →
-              </Link>
-            </div>
+              <div className="relative grid gap-6 lg:grid-cols-2">
+                {judeOriginalGames.slice(0, 2).map((game) => {
+                  const gameText = `${game.slug || ""} ${
+                    game.title || ""
+                  }`.toLowerCase();
+                  const isLahza =
+                    gameText.includes("lahza") || gameText.includes("لحظة");
 
-            <div className="grid gap-6 lg:grid-cols-3">
-              {featuredGames.map((game) => (
-                <Link
-                  key={game.id}
-                  href={`/game/${game.slug}`}
-                  className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
-                >
-                  <div className="relative h-72 overflow-hidden">
-                    {game.image ? (
-                      <img
-                        loading="lazy"
-                        src={game.image}
-                        alt={game.title}
-                        className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
+                  return (
+                    <Link
+                      key={game.id}
+                      href={`/game/${game.slug}`}
+                      className={`group relative isolate min-h-[430px] overflow-hidden rounded-[1.75rem] border bg-slate-950 transition duration-500 hover:-translate-y-2 sm:min-h-[500px] ${
+                        isLahza
+                          ? "border-cyan-400/25 hover:border-cyan-300/70 hover:shadow-[0_25px_80px_rgba(34,211,238,.18)]"
+                          : "border-fuchsia-400/25 hover:border-fuchsia-300/70 hover:shadow-[0_25px_80px_rgba(217,70,239,.18)]"
+                      }`}
+                    >
+                      {game.image ? (
+                        <img
+                          loading="lazy"
+                          src={game.image}
+                          alt={game.title}
+                          className="absolute inset-0 h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-900 text-slate-500">
+                          No Image
+                        </div>
+                      )}
+
+                      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/35 to-[#05060d]" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#05060d] via-transparent to-transparent" />
+
+                      <div
+                        className={`absolute -right-20 -top-20 h-52 w-52 rounded-full blur-[85px] transition duration-500 group-hover:scale-125 ${
+                          isLahza ? "bg-cyan-400/35" : "bg-fuchsia-500/35"
+                        }`}
                       />
-                    ) : (
-                      <div className="flex h-full items-center justify-center bg-slate-900 text-slate-500">
-                        No Image
-                      </div>
-                    )}
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
-
-                    <div className="absolute bottom-5 left-5 right-5">
-                      <h3 className="text-2xl font-black">{game.title}</h3>
-                      <p className="mt-2 line-clamp-2 text-sm text-slate-300">
-                        {game.description || game.meta}
-                      </p>
-
-                      <div className="mt-4 flex items-center justify-between">
-                        <span className="rounded-full bg-fuchsia-600/30 px-4 py-2 text-sm text-fuchsia-200">
-                          {game.category || "Game"}
+                      <div className="absolute left-5 right-5 top-5 flex items-start justify-between gap-3 sm:left-6 sm:right-6 sm:top-6">
+                        <span
+                          className={`rounded-full border px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md sm:text-xs ${
+                            isLahza
+                              ? "border-cyan-300/30 bg-cyan-400/15 text-cyan-100"
+                              : "border-fuchsia-300/30 bg-fuchsia-500/15 text-fuchsia-100"
+                          }`}
+                        >
+                          JUDE ORIGINAL
                         </span>
 
-                        <span className="rounded-full bg-black/50 px-4 py-2 text-sm text-yellow-400">
-                          🔥 {game.plays || 0}
-                        </span>
+                        {isLahza && (
+                          <span className="rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-100 backdrop-blur-md sm:text-xs">
+                            NEW
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
+
+                      <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
+                        <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-300">
+                          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur">
+                            {game.category || "Arcade"}
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 backdrop-blur">
+                            ▶ {Number(game.plays || 0).toLocaleString()} Plays
+                          </span>
+                          <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1.5 text-yellow-300 backdrop-blur">
+                            ★ {game.rating || "5.0"}
+                          </span>
+                        </div>
+
+                        <h3 className="text-3xl font-black leading-tight sm:text-4xl">
+                          {game.title}
+                        </h3>
+                        <p className="mt-3 line-clamp-2 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+                          {game.description ||
+                            game.meta ||
+                            "An original JUDE Game Studio experience."}
+                        </p>
+
+                        <div className="mt-6 flex items-center justify-between gap-4">
+                          <span
+                            className={`inline-flex items-center gap-3 rounded-2xl px-5 py-3 text-sm font-black text-slate-950 shadow-lg transition group-hover:gap-5 sm:px-6 ${
+                              isLahza
+                                ? "bg-gradient-to-r from-cyan-300 to-emerald-300 shadow-cyan-500/20"
+                                : "bg-gradient-to-r from-fuchsia-300 to-violet-300 shadow-fuchsia-500/20"
+                            }`}
+                          >
+                            PLAY NOW <span aria-hidden="true">→</span>
+                          </span>
+
+                          <span className="hidden text-xs font-bold uppercase tracking-[0.22em] text-white/50 sm:block">
+                            No download
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
         <section className="mb-14">
           <div className="mb-6 flex items-center justify-between">
@@ -482,7 +499,7 @@ export default function HomeClient({ initialGames }: { initialGames: any[] }) {
               {Array.from({ length: totalPages }, (_, i) => i + 1)
                 .slice(
                   Math.max(currentPage - 3, 0),
-                  Math.min(currentPage + 2, totalPages)
+                  Math.min(currentPage + 2, totalPages),
                 )
                 .map((page) => (
                   <button
