@@ -445,8 +445,11 @@ export default function HomeClient({
                 "
               >
                 <div className="-rotate-45 text-center">
-                  <div className="text-6xl">🚀</div>
-
+                  <img
+  src="/images/jude-space-shooter.webp"
+  alt="JUDE Space Shooter"
+  className="h-full w-full object-cover"
+/>
                   <p className="mt-4 text-xs font-black uppercase tracking-[0.25em] text-cyan-300">
                     JUDE VANGUARD
                   </p>
