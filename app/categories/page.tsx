@@ -4,8 +4,8 @@ import { supabase } from "@/app/lib/supabase";
 async function getCategories() {
   const { data } = await supabase
     .from("games")
-    .select("category");
-    .eq("is_published", true)
+    .select("category")
+    .eq("is_published", true);
 
   if (!data) return [];
 
