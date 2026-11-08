@@ -5,6 +5,7 @@ async function getGames() {
   const { data } = await supabase
     .from("games")
     .select("*")
+    .eq("is_published", true)
     .order("plays", { ascending: false })
     .limit(50);
 
