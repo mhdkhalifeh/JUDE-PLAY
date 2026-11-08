@@ -3,12 +3,16 @@ import "./globals.css";
 import Navbar from "@/app/components/Navbar";
 import Footer from "@/app/components/Footer";
 import { GoogleAnalytics } from "@next/third-parties/google";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://jude-play.com"),
   title: "JUDE Play",
   description: "Play the best HTML5 browser games online instantly.",
   verification: {
     google: "UiLKAHH70uSkc0Zq722p58jPJ1xEXQMqKsd_-uyqKNw",
+  },
+  other: {
+    "google-adsense-account": "ca-pub-1791515120755145",
   },
   openGraph: {
     title: "JUDE Play",
