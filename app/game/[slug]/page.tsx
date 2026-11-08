@@ -10,6 +10,7 @@ async function getGame(slug: string) {
     .from("games")
     .select("*")
     .eq("slug", slug)
+    .eq("is_published", true)   // جديد
     .single();
 
   return data;
@@ -20,6 +21,7 @@ async function getRelatedGames(category: string, slug: string) {
     .from("games")
     .select("*")
     .eq("category", category)
+    .eq("is_published", true)   // جديد
     .neq("slug", slug)
     .limit(4);
 
@@ -35,12 +37,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const game = await getGame(slug);
 
-  if (!game) {
-    return {
-      title: "Game Not Found | JUDE Play",
-      description: "This game does not exist on JUDE Play.",
-    };
-  }
+ import { notFound } from "next/navigation";
+// ...
+const game = await getGame(slug);
+if (!game) notFound();
 
   const description =
     game.description ||
