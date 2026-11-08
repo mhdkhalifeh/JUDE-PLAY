@@ -5,7 +5,8 @@ export default async function sitemap() {
 
   const { data: games } = await supabase
     .from("games")
-    .select("slug, created_at");
+    .select("slug, created_at")
+    .eq("is_published", true);
 
   const gameUrls =
     games?.map((game) => ({

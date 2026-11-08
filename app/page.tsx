@@ -5,6 +5,7 @@ export default async function HomePage() {
   const { data: games } = await supabase
     .from("games")
     .select("*")
+    .eq("is_published", true)
     .order("created_at", { ascending: false });
 
   return <HomeClient initialGames={games || []} />;

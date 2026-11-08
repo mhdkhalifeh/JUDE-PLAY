@@ -26,6 +26,7 @@ export default async function CategoryPage({
   const { data: games } = await supabase
     .from("games")
     .select("*")
+    .eq("is_published", true)
     .ilike("category", cleanCategory)
     .order("plays", { ascending: false });
 
