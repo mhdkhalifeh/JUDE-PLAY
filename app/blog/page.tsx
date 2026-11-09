@@ -1,164 +1,84 @@
+
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 
-const posts = [
-  {
-    title: "Best Browser Games to Play Online",
-    slug: "best-browser-games",
-    description:
-      "Discover the best browser games you can play instantly without downloads or installation.",
-  },
-  {
-    title: "Why HTML5 Games Are Popular",
-    slug: "why-html5-games-are-popular",
-    description:
-      "Learn why HTML5 games became the standard for fast, lightweight and accessible online gaming.",
-  },
-  {
-    title: "Top Puzzle Games for Quick Fun",
-    slug: "top-puzzle-games",
-    description:
-      "Explore puzzle games that challenge your brain and provide quick entertainment on any device.",
-  },
-  {
-    title: "Free Online Games Without Downloads",
-    slug: "free-online-games",
-    description:
-      "A guide to playing free online games directly in your browser without installing anything.",
-  },
-  {
-    title: "Best Game Categories on JUDE Play",
-    slug: "best-game-categories",
-    description:
-      "Explore the most popular game categories available on JUDE Play.",
-  },
-  {
-    title: "The Rise of Multiplayer Browser Games",
-    slug: "multiplayer-browser-games",
-    description:
-      "Why multiplayer browser games continue to grow in popularity.",
-  },
-  {
-    title: "Why Browser Games Work Great on Mobile Devices",
-    slug: "browser-games-mobile",
-    description:
-      "Discover how browser games provide smooth mobile gaming experiences.",
-  },
-  {
-    title: "The Future of Browser Gaming",
-    slug: "future-of-browser-gaming",
-    description:
-      "How browser gaming continues to evolve and attract millions of players.",
-  },
-  {
-  title: "Best Racing Games You Can Play in Your Browser",
-  slug: "best-racing-games-browser",
-  description:
-    "Discover why browser racing games are perfect for quick speed challenges, casual competition and instant fun without downloads.",
-},
-{
-  title: "Top Action Games for Fast-Paced Fun",
-  slug: "top-action-games-online",
-  description:
-    "Explore action games that challenge reflexes, timing and decision-making directly from your browser.",
-},
-{
-  title: "Best Arcade Games to Play for Free",
-  slug: "best-arcade-games",
-  description:
-    "Learn why arcade games remain popular and how free browser arcade games deliver simple, addictive fun.",
-},
-{
-  title: "How Browser Games Have Changed Over the Years",
-  slug: "history-of-browser-games",
-  description:
-    "A look at how browser games evolved from simple web games to modern HTML5 gaming experiences.",
-},
-{
-  title: "Best Games to Play During Short Breaks",
-  slug: "games-for-short-breaks",
-  description:
-    "Discover why browser games are perfect for short breaks, quick entertainment and casual gaming sessions.",
-},
-{
-  title: "Best Free HTML5 Games in 2026",
-  slug: "best-free-html5-games-2026",
-  description:
-    "Discover the best free HTML5 browser games to play in 2026 without downloads or installations.",
-},
-{
-  title: "Why Browser Games Are Better Than Downloads",
-  slug: "browser-games-vs-download-games",
-  description:
-    "Compare browser games and downloadable games to discover which option is better for casual gaming.",
-},
-{
-  title: "Most Popular Arcade Games Online",
-  slug: "popular-arcade-games-online",
-  description:
-    "Explore the most popular arcade browser games that deliver fast-paced fun for every player.",
-},
-{
-  title: "Browser Games for Kids",
-  slug: "browser-games-for-kids",
-  description:
-    "Find safe and entertaining browser games for kids that are fun, educational and easy to play.",
-},
-{
-  title: "How Browser Games Keep Improving",
-  slug: "how-browser-games-keep-improving",
-  description:
-    "Learn how browser games continue to evolve with modern web technologies and better gaming experiences.",
-},
+export const revalidate = 60;
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+const oldPosts = [
+  ["Best Browser Games to Play Online", "best-browser-games"],
+  ["Why HTML5 Games Are Popular", "why-html5-games-are-popular"],
+  ["Top Puzzle Games for Quick Fun", "top-puzzle-games"],
+  ["Free Online Games Without Downloads", "free-online-games"],
+  ["Best Game Categories on JUDE Play", "best-game-categories"],
+  ["The Rise of Multiplayer Browser Games", "multiplayer-browser-games"],
+  ["Why Browser Games Work Great on Mobile Devices", "browser-games-mobile"],
+  ["The Future of Browser Gaming", "future-of-browser-gaming"],
+  ["Best Racing Games You Can Play in Your Browser", "best-racing-games-browser"],
+  ["Top Action Games for Fast-Paced Fun", "top-action-games-online"],
+  ["Best Arcade Games to Play for Free", "best-arcade-games"],
+  ["How Browser Games Have Changed Over the Years", "history-of-browser-games"],
+  ["Best Games to Play During Short Breaks", "games-for-short-breaks"],
+  ["Best Free HTML5 Games in 2026", "best-free-html5-games-2026"],
+  ["Why Browser Games Are Better Than Downloads", "browser-games-vs-download-games"],
+  ["Most Popular Arcade Games Online", "popular-arcade-games-online"],
+  ["Browser Games for Kids", "browser-games-for-kids"],
+  ["How Browser Games Keep Improving", "how-browser-games-keep-improving"],
 ];
 
 export const metadata = {
   title: "Gaming Blog | JUDE Play",
   description:
-    "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
+    "Explore gaming guides, HTML5 browser games and online gaming articles on JUDE Play.",
   alternates: {
     canonical: "https://jude-play.com/blog",
   },
-  openGraph: {
-    title: "Gaming Blog | JUDE Play",
-    description:
-      "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
-    url: "https://jude-play.com/blog",
-    siteName: "JUDE Play",
-    images: [
-      {
-        url: "https://jude-play.com/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "JUDE Play Blog",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Gaming Blog | JUDE Play",
-    description:
-      "Read gaming guides, browser game tips, HTML5 game articles and online gaming recommendations on the JUDE Play blog.",
-    images: ["https://jude-play.com/og-image.jpg"],
-  },
-  
 };
 
-export default function BlogPage() {
+export default async function BlogPage() {
+  const { data, error } = await supabase
+    .from("articles")
+    .select("title, slug, excerpt, cover_image, published_at")
+    .eq("published", true)
+    .order("published_at", { ascending: false });
+
+  if (error) {
+    console.error("Blog articles error:", error.message);
+  }
+
+  const newPosts = data || [];
+  const newSlugs = new Set(newPosts.map((post) => post.slug));
+
+  const legacyPosts = oldPosts
+    .filter((post) => !newSlugs.has(post[1]))
+    .map(([title, slug]) => ({
+      title,
+      slug,
+      excerpt: "Explore this gaming guide on JUDE Play.",
+      cover_image: null as string | null,
+      published_at: null as string | null,
+    }));
+
+  const posts = [...newPosts, ...legacyPosts];
+
   return (
     <main className="min-h-screen bg-[#070914] text-white">
-      <div className="mx-auto max-w-7xl px-8 py-12">
+      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
         <p className="font-bold uppercase tracking-[0.3em] text-fuchsia-400">
           JUDE PLAY BLOG
         </p>
 
-        <h1 className="mt-4 text-5xl font-black">Gaming Blog</h1>
+        <h1 className="mt-4 text-5xl font-black">
+          Gaming Blog
+        </h1>
 
-        <p className="mt-4 max-w-4xl text-slate-400">
-          Read guides, tips and articles about free browser games, HTML5 games,
-          online gaming categories and how to enjoy games instantly without
-          downloads.
+        <p className="mt-4 max-w-4xl leading-8 text-slate-400">
+          Discover gaming guides, browser game tips, HTML5 games
+          and the latest articles from JUDE Play.
         </p>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -166,17 +86,29 @@ export default function BlogPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="rounded-3xl border border-white/10 bg-slate-950 p-8 transition hover:-translate-y-1 hover:border-fuchsia-500"
+              className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950 transition hover:-translate-y-1 hover:border-fuchsia-500"
             >
-              <h2 className="text-2xl font-black">{post.title}</h2>
+              {post.cover_image && (
+                <img
+                  src={post.cover_image}
+                  alt={post.title}
+                  className="h-56 w-full object-cover"
+                />
+              )}
 
-              <p className="mt-4 leading-7 text-slate-400">
-                {post.description}
-              </p>
+              <div className="p-8">
+                <h2 className="text-2xl font-black">
+                  {post.title}
+                </h2>
 
-              <span className="mt-6 inline-block font-bold text-fuchsia-400">
-                Read Article →
-              </span>
+                <p className="mt-4 leading-7 text-slate-400">
+                  {post.excerpt}
+                </p>
+
+                <span className="mt-6 inline-block font-bold text-fuchsia-400">
+                  Read Article →
+                </span>
+              </div>
             </Link>
           ))}
         </div>

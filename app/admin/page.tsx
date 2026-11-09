@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
+import Link from "next/link";
+
 
 export default function AdminPage() {
   const [games, setGames] = useState<any[]>([]);
@@ -257,11 +259,24 @@ setUser(user);
   return (
     <div className="min-h-screen bg-[#070914] p-8 text-white">
       <div className="mx-auto max-w-7xl">
-        <h1 className="text-5xl font-black">Admin Dashboard</h1>
+        <div className="flex flex-wrap items-center justify-between gap-5">
+          <div>
+            <h1 className="text-4xl font-black md:text-5xl">
+              Admin Dashboard
+            </h1>
+            <p className="mt-3 text-slate-400">
+              Add, edit, upload, save, and manage games on JUDE Play.
+            </p>
+          </div>
 
-        <p className="mt-3 text-slate-400">
-          Add, edit, upload, save, and manage games on JUDE Play.
-        </p>
+          <Link
+            href="/admin/articles"
+            className="inline-flex items-center gap-2 rounded-xl border border-fuchsia-500/40 bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-bold text-white transition hover:opacity-90"
+          >
+            <span aria-hidden="true">ðŸ“</span>
+            Articles Management
+          </Link>
+        </div>
 
         <form
           onSubmit={editingSlug ? updateGame : addGame}
@@ -322,6 +337,7 @@ setUser(user);
             )}
           </div>
 <button
+  type="button"
   onClick={async () => {
     const res = await fetch("/api/import-games");
     const data = await res.json();

@@ -1,0 +1,10 @@
+
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /profile/
+Disallow: /favorites/
+
+Sitemap: https://www.jude-play.com/sitemap.xml

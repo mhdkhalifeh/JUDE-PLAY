@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
+import ArticleEditor from "@/app/components/ArticleEditor";
 
 const ADMIN_EMAIL = "mhd.khalifeh89@gmail.com";
 
@@ -436,21 +437,23 @@ export default function ArticlesAdminPage() {
               />
             </div>
 
+            
             <div className="md:col-span-2">
               <label className="mb-2 block text-sm text-slate-400">
                 Article Content *
               </label>
-              <textarea
-                rows={18}
+
+              <ArticleEditor
                 value={form.content}
-                onChange={(e) => updateField("content", e.target.value)}
-                placeholder={"Write your article here...\n\nSeparate paragraphs with an empty line."}
-                className="w-full rounded-xl border border-white/10 bg-black/40 p-5 leading-8 outline-none focus:border-fuchsia-500"
+                onChange={(html) => updateField("content", html)}
               />
-              <p className="mt-2 text-xs text-slate-500">
-                Separate paragraphs with an empty line. Formatting and headings can be added in a later editor upgrade.
+
+              <p className="mt-3 text-xs text-slate-500">
+                Use the toolbar to add headings, bold text,
+                lists and links to your article.
               </p>
             </div>
+
 
             <div>
               <label className="mb-2 block text-sm text-slate-400">
