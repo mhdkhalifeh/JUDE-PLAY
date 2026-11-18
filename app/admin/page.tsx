@@ -4,9 +4,47 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 import Link from "next/link";
 
+type RatingStats = {
+  game_id: string;
+  average_rating: number | string | null;
+  total_ratings: number | string;
+};
+
 
 export default function AdminPage() {
   const [games, setGames] = useState<any[]>([]);
+  const [publishFilter, setPublishFilter] = useState<
+  "all" | "published" | "draft"
+>("all");
+
+const [gameSearch, setGameSearch] = useState("");
+
+const [contentFilter, setContentFilter] = useState<
+  "all" | "complete" | "review"
+>("all");
+
+function getContentQuality(game: any) {
+  const fields = [
+    "description",
+    "how_to_play",
+    "controls",
+    "tips",
+  ];
+
+  const completed = fields.filter((field) => {
+    const value = game[field];
+    return typeof value === "string" && value.trim().length > 0;
+  }).length;
+
+  return {
+    completed,
+    total: fields.length,
+    percent: Math.round((completed / fields.length) * 100),
+    complete: completed === fields.length,
+  };
+}
+
+  const [ratings, setRatings] = useState<Record<string, RatingStats>>({});
   const [zipFile, setZipFile] = useState<File | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [user, setUser] = useState<any>(null);
@@ -20,10 +58,12 @@ export default function AdminPage() {
     meta: "",
     description: "",
     plays: "0",
-    rating: "5.0",
     status: "Free",
     image: "",
     game_url: "",
+    how_to_play: "",
+    controls: "",
+    tips: "",
   };
 
   const [form, setForm] = useState(emptyForm);
@@ -54,13 +94,29 @@ setUser(user);
   }, []);
 
   async function loadGames() {
-    const { data, error } = await supabase
-      .from("games")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const [gamesResult, ratingsResult] = await Promise.all([
+      supabase
+        .from("games")
+        .select("*")
+        .order("created_at", { ascending: false }),
+      supabase.rpc("get_all_game_rating_stats"),
+    ]);
 
-    if (!error && data) {
-      setGames(data);
+    if (gamesResult.error) {
+      console.error("Unable to load games:", gamesResult.error.message);
+    } else {
+      setGames(gamesResult.data || []);
+    }
+
+    if (ratingsResult.error) {
+      console.error("Unable to load player ratings:", ratingsResult.error.message);
+      setRatings({});
+    } else {
+      const statsByGame: Record<string, RatingStats> = {};
+      for (const item of (ratingsResult.data || []) as RatingStats[]) {
+        statsByGame[item.game_id] = item;
+      }
+      setRatings(statsByGame);
     }
   }
 
@@ -135,10 +191,12 @@ setUser(user);
       meta: form.meta,
       description: form.description,
       plays: Number(form.plays || 0),
-      rating: form.rating,
       status: form.status,
       image: imageUrl,
       game_url: gameUrl,
+      how_to_play: form.how_to_play,
+controls: form.controls,
+tips: form.tips,
     });
 
     if (error) {
@@ -160,10 +218,12 @@ setUser(user);
       meta: game.meta || "",
       description: game.description || "",
       plays: String(game.plays || "0"),
-      rating: String(game.rating || "5.0"),
       status: game.status || "Free",
       image: game.image || "",
       game_url: game.game_url || "",
+      how_to_play: game.how_to_play || "",
+      controls: game.controls || "",
+      tips: game.tips || "",
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -206,10 +266,12 @@ setUser(user);
         meta: form.meta,
         description: form.description,
         plays: Number(form.plays || 0),
-        rating: form.rating,
         status: form.status,
         image: imageUrl,
         game_url: gameUrl,
+        how_to_play: form.how_to_play,
+controls: form.controls,
+tips: form.tips,
       })
       .eq("slug", editingSlug);
 
@@ -221,6 +283,33 @@ setUser(user);
     resetForm();
     await loadGames();
   }
+
+
+async function togglePublish(game: any) {
+  const nextStatus = !game.is_published;
+
+  const confirmed = window.confirm(
+    nextStatus
+      ? `Publish "${game.title}" on JUDE Play?`
+      : `Unpublish "${game.title}" and hide it from visitors?`
+  );
+
+  if (!confirmed) return;
+
+  const { error } = await supabase
+    .from("games")
+    .update({ is_published: nextStatus })
+    .eq("id", game.id);
+
+  if (error) {
+    alert("Unable to update publishing status: " + error.message);
+    return;
+  }
+
+  await loadGames();
+}
+
+
 
   async function deleteGame(slug: string) {
     const confirmDelete = confirm("Are you sure you want to delete this game?");
@@ -236,6 +325,40 @@ setUser(user);
 
     await loadGames();
   }
+
+
+const filteredGames = games.filter((game) => {
+  const matchesStatus =
+    publishFilter === "all" ||
+    (publishFilter === "published" && game.is_published === true) ||
+    (publishFilter === "draft" && game.is_published !== true);
+
+  const searchText =
+    `${game.title || ""} ${game.slug || ""} ${game.category || ""}`
+      .toLowerCase();
+
+
+const quality = getContentQuality(game);
+
+const matchesContent =
+  contentFilter === "all" ||
+  (contentFilter === "complete" && quality.complete) ||
+  (contentFilter === "review" && !quality.complete);
+
+
+  return (
+  matchesStatus &&
+  searchText.includes(gameSearch.trim().toLowerCase()) &&
+  matchesContent
+);
+});
+
+const publishedCount = games.filter(
+  (game) => game.is_published === true
+).length;
+
+const draftCount = games.length - publishedCount;
+
 
   if (loading) {
     return (
@@ -273,25 +396,163 @@ setUser(user);
             href="/admin/articles"
             className="inline-flex items-center gap-2 rounded-xl border border-fuchsia-500/40 bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-bold text-white transition hover:opacity-90"
           >
-            <span aria-hidden="true">ðŸ“</span>
+            <span aria-hidden="true">📝</span>
             Articles Management
           </Link>
         </div>
+
+
+{/* QUICK GAME FINDER */}
+<div className="mt-8 rounded-2xl border border-fuchsia-500/20 bg-[#101322] p-5">
+  <div className="mb-4">
+    <h2 className="text-xl font-black text-white">
+      🔎 Quick Game Finder
+    </h2>
+    <p className="mt-1 text-sm text-slate-400">
+      Search by game title, slug or category.
+    </p>
+  </div>
+
+  <input
+    type="search"
+    value={gameSearch}
+    onChange={(e) => setGameSearch(e.target.value)}
+    placeholder="Type a game name, e.g. Alphabet Mahjong..."
+    className="w-full rounded-xl border border-white/10 bg-[#080b16] px-5 py-4 text-base text-white outline-none transition focus:border-fuchsia-500"
+  />
+
+  {gameSearch.trim() && (
+    <div className="mt-4 space-y-2">
+      {(() => {
+        const search = gameSearch.trim().toLowerCase();
+
+        const matches = games
+          .filter((game) =>
+            [
+              game.title,
+              game.slug,
+              game.category,
+            ].some((value) =>
+              String(value || "")
+                .toLowerCase()
+                .includes(search)
+            )
+          )
+          .slice(0, 10);
+
+        return matches.length > 0 ? (
+          <>
+            {matches.map((game) => (
+              <div
+                key={game.id}
+                className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-3"
+              >
+                {game.image ? (
+                  <img
+                    src={game.image}
+                    alt=""
+                    className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="h-14 w-14 shrink-0 rounded-lg bg-white/10" />
+                )}
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold text-white">
+                    {game.title}
+                  </p>
+
+                  <p className="truncate text-xs text-slate-400">
+                    {game.category} · {game.slug}
+                  </p>
+
+                  <p className="mt-1 text-xs">
+                    <span
+                      className={
+                        game.is_published
+                          ? "text-emerald-400"
+                          : "text-amber-400"
+                      }
+                    >
+                      {game.is_published
+                        ? "Published"
+                        : "Draft"}
+                    </span>
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    startEdit(game);
+                    setGameSearch("");
+                  }}
+                  className="shrink-0 rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-fuchsia-500"
+                >
+                  Edit
+                </button>
+              </div>
+            ))}
+
+            <p className="pt-2 text-xs text-slate-500">
+              Showing up to 10 matching games
+            </p>
+          </>
+        ) : (
+          <p className="py-4 text-center text-sm text-slate-400">
+            No matching games found.
+          </p>
+        );
+      })()}
+    </div>
+  )}
+</div>
+
 
         <form
           onSubmit={editingSlug ? updateGame : addGame}
           className="mt-10 grid gap-4 rounded-3xl border border-white/10 bg-slate-950 p-6 md:grid-cols-2"
         >
-          {Object.keys(form).map((key) => (
-            <input
-              key={key}
-              name={key}
-              value={(form as any)[key]}
-              onChange={handleChange}
-              placeholder={key}
-              className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none focus:border-fuchsia-500"
-            />
-          ))}
+        
+{Object.keys(form).map((key) => {
+  const longTextFields = [
+    "description",
+    "how_to_play",
+    "controls",
+    "tips",
+  ];
+
+  if (longTextFields.includes(key)) {
+    return (
+      <div key={key} className="md:col-span-2">
+        <label className="mb-2 block text-sm font-bold text-slate-300">
+          {key.replaceAll("_", " ").toUpperCase()}
+        </label>
+
+        <textarea
+          name={key}
+          value={(form as any)[key]}
+          onChange={handleChange}
+          rows={key === "description" ? 5 : 4}
+          placeholder={`Enter ${key.replaceAll("_", " ")}...`}
+          className="w-full resize-y rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-white outline-none focus:border-fuchsia-500"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <input
+      key={key}
+      name={key}
+      value={(form as any)[key]}
+      onChange={handleChange}
+      placeholder={key.replaceAll("_", " ")}
+      className="rounded-xl border border-white/10 bg-black/40 px-4 py-3 outline-none focus:border-fuchsia-500"
+    />
+  );
+})}
+
 
           <div className="rounded-xl border border-white/10 bg-black/40 p-4 md:col-span-2">
             <p className="mb-2 text-sm text-slate-400">Upload Game Image</p>
@@ -336,17 +597,46 @@ setUser(user);
               </p>
             )}
           </div>
+
 <button
   type="button"
   onClick={async () => {
-    const res = await fetch("/api/import-games");
-    const data = await res.json();
-    alert(data.message);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      alert("Please log in again.");
+      return;
+    }
+
+    const res = await fetch("/api/import-games", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    const result = await res.json();
+
+    if (!res.ok) {
+      alert(result.error || "Import failed");
+      return;
+    }
+
+    alert(result.message);
+
+    if (result.errors?.length) {
+      console.error("Import errors:", result.errors);
+    }
+
+    await loadGames();
   }}
-  className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl text-white"
+  className="rounded-xl bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
 >
   Import Games
 </button>
+
           <button className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-black md:col-span-2">
             {editingSlug ? "Update Game" : "Add Game"}
           </button>
@@ -362,8 +652,81 @@ setUser(user);
           )}
         </form>
 
+
+<div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+  <div className="flex flex-wrap gap-2">
+    {[
+      { id: "all", label: "All Games", count: games.length },
+      {
+        id: "published",
+        label: "Published",
+        count: publishedCount,
+      },
+      {
+        id: "draft",
+        label: "Drafts",
+        count: draftCount,
+      },
+    ].map((item) => (
+      <button
+        key={item.id}
+        type="button"
+        onClick={() =>
+          setPublishFilter(
+            item.id as "all" | "published" | "draft"
+          )
+        }
+        className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+          publishFilter === item.id
+            ? "bg-fuchsia-600 text-white"
+            : "border border-white/10 bg-slate-950 text-slate-400 hover:text-white"
+        }`}
+      >
+        {item.label} ({item.count})
+      </button>
+
+      
+    ))}
+  </div>
+
+<div className="mt-5 flex flex-wrap items-center gap-2">
+  {[
+    { id: "all", label: "All Content" },
+    { id: "complete", label: "Complete" },
+    { id: "review", label: "Needs Review" },
+  ].map((item) => (
+    <button
+      key={item.id}
+      type="button"
+      onClick={() =>
+        setContentFilter(
+          item.id as "all" | "complete" | "review"
+        )
+      }
+      className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+        contentFilter === item.id
+          ? "bg-fuchsia-600 text-white"
+          : "border border-white/10 bg-slate-950 text-slate-400 hover:text-white"
+      }`}
+    >
+      {item.label}
+    </button>
+  ))}
+</div>
+
+  <input
+    type="search"
+    value={gameSearch}
+    onChange={(e) => setGameSearch(e.target.value)}
+    placeholder="Search games..."
+    className="w-full rounded-xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-fuchsia-500 sm:w-72"
+  />
+</div>
+
+          
+
         <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {games.map((game) => (
+          {filteredGames.map((game) => (
             <div
               key={game.slug}
               className="overflow-hidden rounded-3xl border border-white/10 bg-slate-950"
@@ -382,7 +745,61 @@ setUser(user);
               )}
 
               <div className="p-5">
+
+<div className="mb-3">
+  <span
+    className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+      game.is_published
+        ? "bg-emerald-500/15 text-emerald-400"
+        : "bg-amber-500/15 text-amber-400"
+    }`}
+  >
+    {game.is_published ? "● Published" : "● Draft"}
+  </span>
+</div>
+
                 <h3 className="text-xl font-black">{game.title}</h3>
+
+{(() => {
+  const quality = getContentQuality(game);
+
+  return (
+    <div className="mt-4">
+      <div className="mb-2 flex items-center justify-between text-xs">
+        <span className="font-bold text-slate-400">
+          Content Completeness
+        </span>
+
+        <span
+          className={
+            quality.complete
+              ? "font-bold text-emerald-400"
+              : "font-bold text-amber-400"
+          }
+        >
+          {quality.percent}%
+        </span>
+      </div>
+
+      <div className="h-2 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={`h-full rounded-full transition-all ${
+            quality.complete
+              ? "bg-emerald-400"
+              : "bg-amber-400"
+          }`}
+          style={{ width: `${quality.percent}%` }}
+        />
+      </div>
+
+      <p className="mt-2 text-xs text-slate-500">
+        {quality.complete
+          ? "All content fields completed"
+          : `${quality.total - quality.completed} fields remaining`}
+      </p>
+    </div>
+  );
+})()}
 
                 <p className="mt-2 text-sm text-slate-400">{game.meta}</p>
 
@@ -390,13 +807,39 @@ setUser(user);
                   {game.category}
                 </p>
 
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+                  <span className="text-slate-400">
+                    ▶ {Number(game.plays || 0).toLocaleString()} plays
+                  </span>
+                  <span className="font-bold text-yellow-400">
+                    {Number(ratings[game.id]?.total_ratings || 0) > 0 &&
+                    ratings[game.id]?.average_rating != null
+                      ? `★ ${Number(ratings[game.id].average_rating).toFixed(1)} (${Number(ratings[game.id].total_ratings)})`
+                      : "☆ Not Rated"}
+                  </span>
+                </div>
+
                 {game.game_url && (
                   <p className="mt-3 break-all text-xs text-cyan-300">
                     Game URL: {game.game_url}
                   </p>
                 )}
 
-                <div className="mt-5 flex gap-3">
+                <div className="mt-5 flex flex-wrap gap-3">
+
+                    <button
+                      type="button"
+                      onClick={() => togglePublish(game)}
+                      className={`rounded-xl px-4 py-2 text-sm font-bold transition ${
+                        game.is_published
+                          ? "bg-amber-600 hover:bg-amber-700"
+                          : "bg-emerald-600 hover:bg-emerald-700"
+                      }`}
+                    >
+                      {game.is_published ? "Unpublish" : "Publish"}
+                    </button>
+
+
                   <button
                     onClick={() => startEdit(game)}
                     className="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-bold hover:bg-cyan-700"

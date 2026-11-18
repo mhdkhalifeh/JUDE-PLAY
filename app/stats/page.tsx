@@ -2,7 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 
 async function getStats() {
-  const { data: games } = await supabase.from("games").select("*");
+  const { data: games } = await supabase.from("games").select("*")  .eq("is_published", true);
 
   const totalGames = games?.length || 0;
 

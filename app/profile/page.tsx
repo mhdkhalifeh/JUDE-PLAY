@@ -54,6 +54,7 @@ export default function ProfilePage() {
         const { data: games } = await supabase
           .from("games")
           .select("*")
+          .eq("is_published", true)
           .in("slug", slugs);
 
         setRecentGames(games || []);

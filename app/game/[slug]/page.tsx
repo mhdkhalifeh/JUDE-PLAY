@@ -1,3 +1,5 @@
+import GameRating from "@/app/components/GameRating";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { supabase } from "@/app/lib/supabase";
@@ -6,21 +8,26 @@ import GameFrame from "@/app/components/GameFrame";
 import AchievementTracker from "@/app/components/AchievementTracker";
 import GameActivityTracker from "@/app/components/GameActivityTracker";
 
+const SITE_URL = "https://www.jude-play.com";
+
 async function getGame(slug: string) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("games")
     .select("*")
     .eq("slug", slug)
     .eq("is_published", true)
     .single();
 
+  if (error) return null;
   return data;
 }
 
 async function getRelatedGames(category: string, slug: string) {
   const { data } = await supabase
     .from("games")
-    .select("*")
+    .select(
+      "id, title, slug, description, image, category"
+    )
     .eq("category", category)
     .eq("is_published", true)
     .neq("slug", slug)
@@ -33,56 +40,46 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const game = await getGame(slug);
 
   if (!game) {
     return {
       title: "Game Not Found | JUDE Play",
-      description: "This game does not exist on JUDE Play.",
+      robots: { index: false, follow: false },
     };
   }
 
   const description =
-    game.description ||
-    game.meta ||
-    `Play ${game.title} online for free on JUDE Play.`;
+    game.description?.trim() ||
+    `Play ${game.title} online on JUDE Play. Explore more browser games and discover new challenges.`;
 
-  const image = game.image || "/logo.png";
+  const canonical = `${SITE_URL}/game/${encodeURIComponent(
+    game.slug
+  )}`;
+
+  const image = game.image || `${SITE_URL}/og-image.jpg`;
 
   return {
-    title: `${game.title} | Play Online Free | JUDE Play`,
+    title: `${game.title} | Play Online | JUDE Play`,
     description,
-    keywords: [
-      game.title,
-      game.category,
-      game.meta,
-      "HTML5 Games",
-      "WebGL Games",
-      "Browser Games",
-      "Online Games",
-      "Free Games",
-      "Play Online",
-      "JUDE Play",
-    ].filter(Boolean),
-
+    alternates: {
+      canonical,
+    },
     openGraph: {
       title: `${game.title} | JUDE Play`,
       description,
-      url: `https://jude-play.com/game/${game.slug}`,
+      url: canonical,
       siteName: "JUDE Play",
+      type: "website",
       images: [
         {
           url: image,
-          width: 1200,
-          height: 630,
           alt: game.title,
         },
       ],
-      type: "website",
     },
-
     twitter: {
       card: "summary_large_image",
       title: `${game.title} | JUDE Play`,
@@ -102,18 +99,26 @@ export default async function GamePage({
 
   if (!game) notFound();
 
-  await supabase
-    .from("games")
-    .update({ plays: (game.plays || 0) + 1 })
-    .eq("id", game.id);
+
+  const description =
+    game.description?.trim() || "";
+
+  const relatedGames = await getRelatedGames(
+    game.category,
+    game.slug
+  );
+
+  const gameUrl = `${SITE_URL}/game/${encodeURIComponent(
+    game.slug
+  )}`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "VideoGame",
     name: game.title,
-    description: game.description || game.meta,
-    image: game.image,
-    url: `https://jude-play.com/game/${game.slug}`,
+    ...(description ? { description } : {}),
+    ...(game.image ? { image: game.image } : {}),
+    url: gameUrl,
     genre: game.category,
     applicationCategory: "Game",
     operatingSystem: "Web Browser",
@@ -124,7 +129,10 @@ export default async function GamePage({
     },
   };
 
-  const relatedGames = await getRelatedGames(game.category, game.slug);
+  const safeJsonLd = JSON.stringify(jsonLd).replace(
+    /</g,
+    "\\u003c"
+  );
 
   return (
     <main className="min-h-screen bg-[#050816] text-white">
@@ -133,27 +141,53 @@ export default async function GamePage({
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLd }}
       />
 
       <div className="mx-auto max-w-7xl p-6 md:p-8">
-        <div className="mb-8">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-7 text-sm text-slate-400"
+        >
+          <Link
+            href="/"
+            className="transition hover:text-fuchsia-400"
+          >
+            Home
+          </Link>
+          <span className="mx-2">/</span>
+          <Link
+            href="/categories"
+            className="transition hover:text-fuchsia-400"
+          >
+            Games
+          </Link>
+          <span className="mx-2">/</span>
+          <span className="text-slate-200">
+            {game.title}
+          </span>
+        </nav>
+
+        <header className="mb-8">
           <p className="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-fuchsia-400">
             {game.category}
           </p>
 
-          <h1 className="text-4xl font-black md:text-5xl">{game.title}</h1>
+          <h1 className="text-4xl font-black md:text-5xl">
+            {game.title}
+          </h1>
 
-          <p className="mt-4 max-w-3xl text-slate-300">
-            {game.description || game.meta}
+          <p className="mt-3 text-sm text-slate-400">
+            Play directly in your browser on JUDE Play.
           </p>
-        </div>
+        </header>
 
         <GameFrame
-          gameUrl={game.game_url}
-          title={game.title}
-          gameType={game.game_type || "local"}
-        />
+  gameId={game.id}
+  gameUrl={game.game_url}
+  title={game.title}
+  gameType={game.game_type || "local"}
+/>
 
         <div className="mt-5 flex flex-wrap gap-3">
           <FavoriteButton gameSlug={game.slug} />
@@ -166,43 +200,93 @@ export default async function GamePage({
           </Link>
         </div>
 
-        <section className="mt-10 rounded-3xl border border-white/10 bg-slate-950 p-6">
-          <h2 className="text-2xl font-black">About This Game</h2>
+        <section className="mt-10 rounded-3xl border border-white/10 bg-slate-950 p-6 md:p-8">
+          <h2 className="text-2xl font-black">
+            About {game.title}
+          </h2>
 
-          <p className="mt-4 leading-8 text-slate-300">
-            {game.description || "No description available."}
-          </p>
+          {description ? (
+            <p className="mt-4 whitespace-pre-line leading-8 text-slate-300">
+              {description}
+            </p>
+          ) : (
+            <p className="mt-4 leading-8 text-slate-400">
+              Game details are not available yet.
+            </p>
+          )}
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl bg-white/5 p-5">
-              <p className="text-sm text-slate-400">Plays</p>
+              <p className="text-sm text-slate-400">
+                Plays
+              </p>
               <p className="mt-2 text-3xl font-black">
-                {(game.plays || 0) + 1}
+                {Number(game.plays || 0).toLocaleString()}
               </p>
             </div>
 
-            <div className="rounded-2xl bg-white/5 p-5">
-              <p className="text-sm text-slate-400">Rating</p>
-              <p className="mt-2 text-3xl font-black">
-                {game.rating || "5.0"}
-              </p>
-            </div>
+            <GameRating gameId={game.id} />
 
             <div className="rounded-2xl bg-white/5 p-5">
-              <p className="text-sm text-slate-400">Status</p>
-              <p className="mt-2 text-3xl font-black">
-                {game.status || "Free"}
+              <p className="text-sm text-slate-400">
+                Category
+              </p>
+              <p className="mt-2 text-2xl font-black">
+                {game.category}
               </p>
             </div>
           </div>
         </section>
 
+
+{[
+  {
+    title: "How to Play",
+    content: game.how_to_play,
+  },
+  {
+    title: "Game Controls",
+    content: game.controls,
+  },
+  {
+    title: "Tips & Strategy",
+    content: game.tips,
+  },
+]
+  .filter(
+    (section) =>
+      typeof section.content === "string" &&
+      section.content.trim().length > 0
+  )
+  .map((section) => (
+    <section
+      key={section.title}
+      className="mt-6 rounded-3xl border border-white/10 bg-slate-950 p-6 md:p-8"
+    >
+      <h2 className="text-2xl font-black text-white">
+        {section.title}
+      </h2>
+
+      <div className="mt-4 whitespace-pre-line text-sm leading-8 text-slate-300 md:text-base">
+        {section.content}
+      </div>
+    </section>
+  ))}
+
+
         {relatedGames.length > 0 && (
-          <section className="mt-10">
-            <h2 className="mb-6 text-3xl font-black">Related Games</h2>
+          <section className="mt-12">
+            <div className="mb-6">
+              <h2 className="text-3xl font-black">
+                More {game.category} Games
+              </h2>
+              <p className="mt-2 text-slate-400">
+                Discover more games in the same category.
+              </p>
+            </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedGames.map((relatedGame: any) => (
+              {relatedGames.map((relatedGame) => (
                 <Link
                   key={relatedGame.id}
                   href={`/game/${relatedGame.slug}`}
@@ -222,13 +306,19 @@ export default async function GamePage({
                   )}
 
                   <div className="p-4">
-                    <h3 className="line-clamp-1 text-xl font-black">
+                    <h3 className="line-clamp-2 text-xl font-black">
                       {relatedGame.title}
                     </h3>
 
-                    <p className="mt-2 line-clamp-2 text-sm text-slate-400">
-                      {relatedGame.description}
-                    </p>
+                    {relatedGame.description && (
+                      <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-400">
+                        {relatedGame.description}
+                      </p>
+                    )}
+
+                    <span className="mt-4 inline-block text-sm font-bold text-fuchsia-400">
+                      Play Game →
+                    </span>
                   </div>
                 </Link>
               ))}
