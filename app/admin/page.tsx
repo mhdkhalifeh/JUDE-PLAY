@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/app/lib/supabase";
 import Link from "next/link";
 
@@ -49,6 +49,10 @@ function getContentQuality(game: any) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const savingRef = useRef(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [fileReset, setFileReset] = useState(0);
   const [editingSlug, setEditingSlug] = useState<string | null>(null);
 
   const emptyForm = {
@@ -140,8 +144,7 @@ setUser(user);
       });
 
     if (error) {
-      alert(error.message);
-      return form.image;
+      throw new Error("Image upload failed: " + error.message);
     }
 
     const { data } = supabase.storage
@@ -156,57 +159,80 @@ setUser(user);
     setZipFile(null);
     setImageFile(null);
     setEditingSlug(null);
+    setFileReset(value => value + 1);
   }
 
-  async function addGame(e: any) {
+  async function saveGame(e: any, editing: boolean) {
     e.preventDefault();
-
-    const imageUrl = await uploadImage(form.slug);
-    let gameUrl = form.game_url;
-
-    if (zipFile) {
-      const data = new FormData();
-      data.append("file", zipFile);
-      data.append("slug", form.slug);
-
-      const res = await fetch("/api/upload-game", {
-        method: "POST",
-        body: data,
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.error || "Upload failed");
-        return;
+    if (savingRef.current || (editing && !editingSlug)) return;
+    savingRef.current = true;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const slug = form.slug.trim();
+      if (!form.title.trim() || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
+        throw new Error("Enter a title and a lowercase slug such as judoku.");
       }
-
-      gameUrl = result.gameUrl;
+      let gameUrl = form.game_url.trim();
+      if (zipFile) {
+        if (zipFile.size > 4 * 1024 * 1024) {
+          throw new Error("ZIP must be smaller than 4 MB. Use the optimized web version.");
+        }
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) throw new Error("Please log in again.");
+        const body = new FormData();
+        body.append("file", zipFile);
+        body.append("slug", slug);
+        const response = await fetch("/api/upload-game", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          body,
+        });
+        const text = await response.text();
+        let result: any;
+        try { result = JSON.parse(text); }
+        catch {
+          throw new Error(response.status === 413
+            ? "The host rejected the upload size. Use the optimized ZIP."
+            : `Upload failed (HTTP ${response.status}). Check the server deployment logs.`);
+        }
+        if (!response.ok || result.success !== true) {
+          throw new Error(result.error || "Game upload failed.");
+        }
+        if (typeof result.gameUrl !== "string" || !result.gameUrl.trim()) {
+          throw new Error("Upload did not return a gameUrl. Nothing was saved. Check /api/upload-game.");
+        }
+        gameUrl = result.gameUrl.trim();
+        // Keep a successful upload available if saving the database record needs retrying.
+        setForm(previous => ({ ...previous, game_url: gameUrl }));
+        setZipFile(null);
+        setFileReset(value => value + 1);
+      }
+      if (!gameUrl || !(/^(https?:\/\/|\/(?!\/))/.test(gameUrl))) {
+        throw new Error("Upload the game ZIP or enter a valid game URL before saving.");
+      }
+      const imageUrl = await uploadImage(slug);
+      const payload = {
+        title: form.title.trim(), slug, category: form.category,
+        meta: form.meta, description: form.description,
+        plays: Number(form.plays || 0), status: form.status,
+        image: imageUrl, game_url: gameUrl,
+        how_to_play: form.how_to_play, controls: form.controls, tips: form.tips,
+      };
+      const result = editing
+        ? await supabase.from("games").update(payload).eq("slug", editingSlug)
+        : await supabase.from("games").insert({ ...payload, is_published: false });
+      if (result.error) throw new Error(result.error.message);
+      resetForm();
+      await loadGames();
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Unable to save game.");
+    } finally {
+      savingRef.current = false;
+      setSaving(false);
     }
-
-    const { error } = await supabase.from("games").insert({
-      title: form.title,
-      slug: form.slug,
-      category: form.category,
-      meta: form.meta,
-      description: form.description,
-      plays: Number(form.plays || 0),
-      status: form.status,
-      image: imageUrl,
-      game_url: gameUrl,
-      how_to_play: form.how_to_play,
-controls: form.controls,
-tips: form.tips,
-    });
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    resetForm();
-    await loadGames();
   }
+  async function addGame(e: any) { await saveGame(e, false); }
 
   function startEdit(game: any) {
     setEditingSlug(game.slug);
@@ -229,64 +255,14 @@ tips: form.tips,
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function updateGame(e: any) {
-    e.preventDefault();
-
-    if (!editingSlug) return;
-
-    const imageUrl = await uploadImage(form.slug);
-    let gameUrl = form.game_url;
-
-    if (zipFile) {
-      const data = new FormData();
-      data.append("file", zipFile);
-      data.append("slug", form.slug);
-
-      const res = await fetch("/api/upload-game", {
-        method: "POST",
-        body: data,
-      });
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        alert(result.error || "Upload failed");
-        return;
-      }
-
-      gameUrl = result.gameUrl;
-    }
-
-    const { error } = await supabase
-      .from("games")
-      .update({
-        title: form.title,
-        slug: form.slug,
-        category: form.category,
-        meta: form.meta,
-        description: form.description,
-        plays: Number(form.plays || 0),
-        status: form.status,
-        image: imageUrl,
-        game_url: gameUrl,
-        how_to_play: form.how_to_play,
-controls: form.controls,
-tips: form.tips,
-      })
-      .eq("slug", editingSlug);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    resetForm();
-    await loadGames();
-  }
-
+  async function updateGame(e: any) { await saveGame(e, true); }
 
 async function togglePublish(game: any) {
   const nextStatus = !game.is_published;
+  if (nextStatus && !game.game_url?.trim()) {
+    alert("Add a working game URL before publishing this game.");
+    return;
+  }
 
   const confirmed = window.confirm(
     nextStatus
@@ -514,6 +490,8 @@ const draftCount = games.length - publishedCount;
           className="mt-10 grid gap-4 rounded-3xl border border-white/10 bg-slate-950 p-6 md:grid-cols-2"
         >
         
+{saveError && <p role="alert" className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-red-200 md:col-span-2">{saveError}</p>}
+<fieldset disabled={saving} className="contents">
 {Object.keys(form).map((key) => {
   const longTextFields = [
     "description",
@@ -558,6 +536,7 @@ const draftCount = games.length - publishedCount;
             <p className="mb-2 text-sm text-slate-400">Upload Game Image</p>
 
             <input
+              key={`image-${fileReset}`}
               type="file"
               accept="image/*"
               onChange={(e) => {
@@ -581,6 +560,7 @@ const draftCount = games.length - publishedCount;
             </p>
 
             <input
+              key={`zip-${fileReset}`}
               type="file"
               accept=".zip"
               onChange={(e) => {
@@ -638,7 +618,7 @@ const draftCount = games.length - publishedCount;
 </button>
 
           <button className="rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 px-6 py-3 font-black md:col-span-2">
-            {editingSlug ? "Update Game" : "Add Game"}
+            {saving ? "Uploading & saving…" : editingSlug ? "Update Game" : "Add Game"}
           </button>
 
           {editingSlug && (
@@ -650,6 +630,7 @@ const draftCount = games.length - publishedCount;
               Cancel Edit
             </button>
           )}
+        </fieldset>
         </form>
 
 
