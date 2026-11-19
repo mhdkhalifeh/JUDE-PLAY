@@ -208,7 +208,7 @@ export default function HomeClient({ initialGames }: Props) {
           {recentlyPlayed.length > 0 && <button onClick={() => { setMenuOpen(false); document.getElementById("continue-playing")?.scrollIntoView({ behavior: "smooth" }); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-200 hover:bg-white/[0.06]"><Clock3 size={17} className="text-violet-400"/> Recently played</button>}
           <Link href="/new-games" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/[0.06]"><Sparkles size={17} className="text-violet-400"/> New games</Link>
           <Link href="/top-games" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/[0.06]"><Flame size={17} className="text-violet-400"/> Popular games</Link>
-          <button onClick={() => { setMenuOpen(false); document.getElementById("jude-originals")?.scrollIntoView({ behavior: "smooth" }); }} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-slate-200 hover:bg-white/[0.06]"><Zap size={17} className="text-violet-400"/> JUDE Originals</button>
+          <Link href="/jude-originals" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/[0.06]"><Zap size={17} className="text-violet-400"/> JUDE Originals</Link>
           <Link href="/favorites" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/[0.06]"><Heart size={17} className="text-violet-400"/> My favorites</Link>
           <Link href="/categories" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/[0.06]"><Grid2X2 size={17} className="text-violet-400"/> All categories</Link>
         </nav>
@@ -262,7 +262,7 @@ export default function HomeClient({ initialGames }: Props) {
             <RowSection title="Popular games" items={popular.slice(0, 18)} href="/top-games" icon={<Flame size={19} className="text-orange-400"/>}/>
 
             <section id="jude-originals" className="mb-9">
-              <h2 className="mb-3 flex items-center gap-2 text-lg font-extrabold sm:text-xl"><Zap size={19} className="text-cyan-300"/> JUDE Game Studio Originals</h2>
+              <div className="mb-3 flex items-center justify-between gap-3"><h2 className="flex items-center gap-2 text-lg font-extrabold sm:text-xl"><Zap size={19} className="text-cyan-300"/> JUDE Game Studio Originals</h2><Link href="/jude-originals" className="shrink-0 text-xs font-bold text-violet-300 hover:text-white">View all <ChevronRight size={15} className="inline"/></Link></div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <a href={SPACE_SHOOTER_URL} target="_blank" rel="noopener noreferrer" className="group relative aspect-[16/8] overflow-hidden rounded-2xl border border-violet-400/25 bg-[#111526]">
                   <img src={SPACE_SHOOTER_IMAGE} alt="JUDE Space Shooter" loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105"/>
