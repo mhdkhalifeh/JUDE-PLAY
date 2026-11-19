@@ -113,6 +113,7 @@ export default function HomeClient({ initialGames }: Props) {
   const popular = useMemo(() => [...games].sort((a, b) => Number(b.plays || 0) - Number(a.plays || 0)), [games]);
   const latest = games; // app/page.tsx already sorts by created_at descending
   const lahza = games.find((game) => /lahza|لحظة/i.test(`${game.slug} ${game.title}`));
+  const judoku = games.find((game) => game.slug === "judoku");
   const topPicks = popular.slice(0, 10);
   const featured = popular.slice(10, 26);
   const filtered = useMemo(() => games.filter((game) => {
@@ -262,7 +263,7 @@ export default function HomeClient({ initialGames }: Props) {
 
             <section id="jude-originals" className="mb-9">
               <h2 className="mb-3 flex items-center gap-2 text-lg font-extrabold sm:text-xl"><Zap size={19} className="text-cyan-300"/> JUDE Game Studio Originals</h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 <a href={SPACE_SHOOTER_URL} target="_blank" rel="noopener noreferrer" className="group relative aspect-[16/8] overflow-hidden rounded-2xl border border-violet-400/25 bg-[#111526]">
                   <img src={SPACE_SHOOTER_IMAGE} alt="JUDE Space Shooter" loading="lazy" className="h-full w-full object-cover transition-transform group-hover:scale-105"/>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"/>
@@ -273,6 +274,30 @@ export default function HomeClient({ initialGames }: Props) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent"/>
                   <div className="absolute bottom-4 left-4"><span className="text-[10px] font-bold text-cyan-300">JUDE ORIGINAL</span><h3 className="text-xl font-extrabold">LAHZA</h3></div>
                 </Link>}
+                {judoku && (
+  <Link
+    href={`/game/${judoku.slug}`}
+    className="group relative aspect-[16/8] overflow-hidden rounded-2xl border border-amber-400/25 bg-[#111526]"
+  >
+    {judoku.image && (
+      <img
+        src={judoku.image}
+        alt="JUDOKU"
+        loading="lazy"
+        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+    )}
+
+    <div className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" />
+
+    <div className="absolute bottom-4 left-4">
+      <span className="text-[10px] font-bold text-cyan-300">
+        JUDE ORIGINAL
+      </span>
+      <h3 className="text-xl font-extrabold">JUDOKU</h3>
+    </div>
+  </Link>
+)}
               </div>
             </section>
           </>}
