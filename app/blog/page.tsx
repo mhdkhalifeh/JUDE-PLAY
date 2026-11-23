@@ -21,29 +21,6 @@ type Post = {
   published_at: string | null;
 };
 
-// These remain links to the site's existing legacy blog routes.
-// A card summary does not replace the article content at /blog/[slug].
-const legacyPosts: Post[] = [
-  { title: "Best Browser Games to Play Online", slug: "best-browser-games", excerpt: "A guide to exploring browser games and finding the genres that match the way you like to play.", cover_image: null, published_at: null },
-  { title: "Why HTML5 Games Are Popular", slug: "why-html5-games-are-popular", excerpt: "Learn what makes HTML5 useful for games that run directly in a modern web browser.", cover_image: null, published_at: null },
-  { title: "Top Puzzle Games for Quick Fun", slug: "top-puzzle-games", excerpt: "Explore puzzle-game styles and what makes a short logic challenge satisfying.", cover_image: null, published_at: null },
-  { title: "Free Online Games Without Downloads", slug: "free-online-games", excerpt: "What to expect from games that launch in your browser without a separate installation.", cover_image: null, published_at: null },
-  { title: "Best Game Categories on JUDE Play", slug: "best-game-categories", excerpt: "A tour of game categories on JUDE Play to help you discover something different.", cover_image: null, published_at: null },
-  { title: "The Rise of Multiplayer Browser Games", slug: "multiplayer-browser-games", excerpt: "Explore how browser-based multiplayer gaming connects players and changes online play.", cover_image: null, published_at: null },
-  { title: "Why Browser Games Work Great on Mobile Devices", slug: "browser-games-mobile", excerpt: "A closer look at mobile browser play, touch controls, and screen-size considerations.", cover_image: null, published_at: null },
-  { title: "The Future of Browser Gaming", slug: "future-of-browser-gaming", excerpt: "Explore the technologies and design trends shaping the next generation of browser games.", cover_image: null, published_at: null },
-  { title: "Best Racing Games You Can Play in Your Browser", slug: "best-racing-games-browser", excerpt: "Discover browser racing formats, from quick arcade runs to more challenging driving games.", cover_image: null, published_at: null },
-  { title: "Top Action Games for Fast-Paced Fun", slug: "top-action-games-online", excerpt: "Explore the reflexes, timing, and challenges common to fast-paced browser action games.", cover_image: null, published_at: null },
-  { title: "Best Arcade Games to Play for Free", slug: "best-arcade-games", excerpt: "Learn why quick rounds, simple goals, and replayable challenges define arcade gaming.", cover_image: null, published_at: null },
-  { title: "How Browser Games Have Changed Over the Years", slug: "history-of-browser-games", excerpt: "Follow the evolution of browser-based games and the technologies behind them.", cover_image: null, published_at: null },
-  { title: "Best Games to Play During Short Breaks", slug: "games-for-short-breaks", excerpt: "Ideas for picking games with quick sessions when you only have a few minutes.", cover_image: null, published_at: null },
-  { title: "Best Free HTML5 Games in 2026", slug: "best-free-html5-games-2026", excerpt: "Explore HTML5 game categories and consider what makes a browser game worth revisiting.", cover_image: null, published_at: null },
-  { title: "Why Browser Games Are Better Than Downloads", slug: "browser-games-vs-download-games", excerpt: "Compare the convenience and trade-offs of playing in a browser versus installing a game.", cover_image: null, published_at: null },
-  { title: "Most Popular Arcade Games Online", slug: "popular-arcade-games-online", excerpt: "Explore the familiar styles and mechanics found in popular online arcade games.", cover_image: null, published_at: null },
-  { title: "Browser Games for Kids", slug: "browser-games-for-kids", excerpt: "Consider game suitability, ease of use, and supervision when choosing browser games for children.", cover_image: null, published_at: null },
-  { title: "How Browser Games Keep Improving", slug: "how-browser-games-keep-improving", excerpt: "A look at improvements in performance, device support, and browser-game design.", cover_image: null, published_at: null },
-];
-
 function prettyDate(date: string | null) {
   if (!date) return null;
   const parsed = new Date(date);
@@ -67,12 +44,7 @@ export default async function BlogPage() {
 
   if (error) console.error("Blog articles error:", error.message);
 
-  const databasePosts = (data ?? []) as Post[];
-  const existingSlugs = new Set(databasePosts.map((post) => post.slug));
-  const posts = [
-    ...databasePosts,
-    ...legacyPosts.filter((post) => !existingSlugs.has(post.slug)),
-  ];
+  const posts = (data ?? []) as Post[];
 
   return (
     <main className="min-h-screen bg-[#070914] text-white">

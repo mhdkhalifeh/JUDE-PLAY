@@ -1,10 +1,8 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import sanitizeHtml from "sanitize-html";
-import LegacyBlogPostPage, {
-  generateMetadata as legacyGenerateMetadata,
-} from "./legacy-page";
 
 export const revalidate = 60;
 
@@ -144,7 +142,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const article = await getArticle(slug);
 
   if (!article) {
-    return legacyGenerateMetadata({ params: Promise.resolve({ slug }) });
+    return { title: "Article Not Found | JUDE Play", robots: { index: false, follow: false } };
   }
 
   const title = textForMeta(article.seo_title) || article.title;
@@ -183,10 +181,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
   const article = await getArticle(slug);
 
-  // Preserve the existing static/legacy articles.
-  if (!article) {
-    return LegacyBlogPostPage({ params: Promise.resolve({ slug }) });
-  }
+  if (!article) notFound();
 
   const safeHtml = renderSafeArticleHtml(article.content || "");
   const dateLabel = formattedDate(article.published_at);

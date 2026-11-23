@@ -22,18 +22,40 @@ function safePath(value: string) {
   return value.length <= 500 && !/[\\\x00-\x1f?#%:]/.test(value) &&
     !value.startsWith('/') && value.split('/').every(p => p && p !== '.' && p !== '..' && !p.startsWith('.'));
 }
+
+type ZipStream = {
+  on(
+    event: "data",
+    callback: (chunk: Uint8Array) => void
+  ): ZipStream;
+  on(
+    event: "error",
+    callback: (error: Error) => void
+  ): ZipStream;
+  on(
+    event: "end",
+    callback: () => void
+  ): ZipStream;
+  pause(): ZipStream;
+  resume(): ZipStream;
+};
+
 function readBounded(
   entry: JSZip.JSZipObject,
-  limit: number,
+  limit: number
 ): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const chunks: Buffer[] = [];
+    const chunks: Uint8Array[] = [];
     let size = 0;
     let failed = false;
 
-    const stream = entry.nodeStream("nodebuffer");
+    const stream = (
+      entry as unknown as {
+        internalStream: (type: "uint8array") => ZipStream;
+      }
+    ).internalStream("uint8array");
 
-    stream.on("data", (chunk: Buffer) => {
+    stream.on("data", (chunk: Uint8Array) => {
       if (failed) return;
 
       size += chunk.length;
@@ -42,7 +64,7 @@ function readBounded(
         failed = true;
         stream.pause();
         reject(
-          new Error("ZIP contents exceed the allowed size."),
+          new Error("ZIP contents exceed the allowed size.")
         );
         return;
       }
@@ -51,6 +73,7 @@ function readBounded(
     });
 
     stream.on("error", (error: Error) => {
+      if (failed) return;
       failed = true;
       reject(error);
     });
@@ -60,8 +83,11 @@ function readBounded(
         resolve(Buffer.concat(chunks, size));
       }
     });
+
+    stream.resume();
   });
 }
+
 export async function POST(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
