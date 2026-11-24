@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import LatestArticles from "@/app/blog/LatestArticles";
 import { supabase } from "@/app/lib/supabase";
 
 const SPACE_SHOOTER_URL = "https://jude-space-shooter.vercel.app/";
@@ -329,9 +328,6 @@ export default function HomeClient({
               >
                 Browse Games
               </button>
-              <Link href="/blog" className="inline-flex min-w-[130px] items-center justify-center rounded-xl border border-cyan-300/50 bg-cyan-300/10 px-6 py-4 text-sm font-bold text-cyan-100 transition hover:bg-cyan-300/20">
-                Articles
-              </Link>
             </div>
 
             <div className="mt-8 grid max-w-[510px] grid-cols-3 gap-3">
@@ -573,8 +569,6 @@ export default function HomeClient({
             </div>
           </section>
         )}
-
-        {query.trim() === "" && selectedCategory === "All" && <LatestArticles />}
 
         {/* TRENDING */}
         <section className="mb-16">
