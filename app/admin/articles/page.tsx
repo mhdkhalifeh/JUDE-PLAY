@@ -24,6 +24,9 @@ type Article = {
   created_at: string;
   updated_at: string;
   discussion_question: string | null;
+  featured_on_blog: boolean;
+  related_article_ids: string[];
+  related_game_slug: string | null;
 };
 
 const emptyForm = {
@@ -37,6 +40,9 @@ const emptyForm = {
   published: false,
   cover_image: "",
   discussion_question: "",
+  related_first: "",
+  related_second: "",
+  related_game_slug: "",
 };
 
 function makeSlug(value: string) {
@@ -53,6 +59,7 @@ export default function ArticlesAdminPage() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [updatingFeature, setUpdatingFeature] = useState(false);
   const [articles, setArticles] = useState<Article[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -126,6 +133,9 @@ export default function ArticlesAdminPage() {
       seo_description: article.seo_description || "",
       published: article.published,
       discussion_question: article.discussion_question || "",
+      related_first: article.related_article_ids[0] || "",
+      related_second: article.related_article_ids[1] || "",
+      related_game_slug: article.related_game_slug || "",
       cover_image: article.cover_image || "",
     });
 
@@ -182,6 +192,13 @@ export default function ArticlesAdminPage() {
     setMessage("");
 
     try {
+      const gameSlug = form.related_game_slug.trim();
+      if (gameSlug) {
+        const { data: game, error } = await supabase.from("games")
+          .select("slug").eq("slug", gameSlug).eq("is_published", true).maybeSingle();
+        if (error) throw error;
+        if (!game) throw new Error("Enter the slug of a published game.");
+      }
       const imageUrl = await uploadCover(slug);
 
       const existingArticle = articles.find(
@@ -200,6 +217,8 @@ export default function ArticlesAdminPage() {
           form.seo_description.trim() || form.excerpt.trim(),
         published: publish,
         discussion_question: form.discussion_question.trim() || null,
+        related_article_ids: [...new Set([form.related_first, form.related_second].filter(Boolean))],
+        related_game_slug: gameSlug || null,
         published_at: publish
           ? existingArticle?.published_at || new Date().toISOString()
           : null,
@@ -232,6 +251,24 @@ export default function ArticlesAdminPage() {
       alert(error.message || "Something went wrong.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function changeFeaturedArticle(article: Article) {
+    setUpdatingFeature(true);
+    setMessage("");
+    try {
+      const { error } = await supabase.rpc("set_featured_blog_article", {
+        p_article_id: article.featured_on_blog ? null : article.id,
+      });
+      if (error) {
+        setMessage(error.message);
+        return;
+      }
+      setMessage(article.featured_on_blog ? "The hero now uses the latest article." : "Featured article updated.");
+      await loadArticles();
+    } finally {
+      setUpdatingFeature(false);
     }
   }
 
@@ -454,6 +491,32 @@ export default function ArticlesAdminPage() {
                 value={form.content}
                 onChange={(html) => updateField("content", html)}
               />
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {(["related_first", "related_second"] as const).map((field, index) => (
+                  <label key={field} className="block text-sm font-bold text-slate-300">
+                    Related article {index + 1}
+                    <select
+                      value={form[field]}
+                      onChange={(event) => updateField(field, event.target.value)}
+                      className="mt-2 block w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3"
+                    >
+                      <option value="">None</option>
+                      {articles.filter((article) =>
+                        article.id !== editingId &&
+                        (article.published || form[field] === article.id) &&
+                        article.id !== form[index === 0 ? "related_second" : "related_first"]
+                      ).map((article) => <option key={article.id} value={article.id}>{article.title}</option>)}
+                    </select>
+                  </label>
+                ))}
+              </div>
+              <label htmlFor="related-game" className="mt-5 block text-sm font-bold text-slate-300">
+                Related game slug (optional)
+              </label>
+              <input id="related-game" value={form.related_game_slug}
+                onChange={(event) => updateField("related_game_slug", event.target.value)}
+                placeholder="Slug from the game's page URL"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3" />
               <label htmlFor="discussion-question" className="mt-5 block text-sm font-bold text-slate-300">
                 Discussion question (optional)
               </label>
@@ -570,6 +633,13 @@ export default function ArticlesAdminPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  {(article.published || article.featured_on_blog) && (
+                    <button type="button" disabled={updatingFeature || saving}
+                      onClick={() => void changeFeaturedArticle(article)}
+                      className="rounded-lg border border-fuchsia-400/40 bg-fuchsia-500/10 px-4 py-2 text-sm font-bold text-fuchsia-200 disabled:opacity-50">
+                      {article.featured_on_blog ? "Remove from hero" : "Show in hero"}
+                    </button>
+                  )}
                   {article.published && (
                     <Link
                       href={`/blog/${article.slug}`}

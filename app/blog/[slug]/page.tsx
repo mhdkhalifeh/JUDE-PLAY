@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import sanitizeHtml from "sanitize-html";
 import ArticleEngagement from "./ArticleEngagement";
+import ArticleCard, { ARTICLE_CARD_FIELDS } from "../ArticleCard";
 
 export const revalidate = 60;
 
@@ -27,6 +28,8 @@ type Article = {
   seo_description: string | null;
   published_at: string | null;
   discussion_question: string | null;
+  related_article_ids: string[];
+  related_game_slug: string | null;
 };
 
 type PageProps = {
@@ -37,7 +40,7 @@ async function getArticle(slug: string): Promise<Article | null> {
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id,title,slug,excerpt,content,cover_image,category,seo_title,seo_description,published_at,discussion_question"
+      "id,title,slug,excerpt,content,cover_image,category,seo_title,seo_description,published_at,discussion_question,related_article_ids,related_game_slug"
     )
     .eq("slug", slug)
     .eq("published", true)
@@ -185,6 +188,21 @@ export default async function BlogPostPage({ params }: PageProps) {
 
   if (!article) notFound();
 
+  const [relatedResult, gameResult] = await Promise.all([
+    article.related_article_ids.length
+      ? supabase.from("articles").select(`${ARTICLE_CARD_FIELDS},id`)
+          .eq("published", true).neq("id", article.id).in("id", article.related_article_ids)
+      : null,
+    article.related_game_slug
+      ? supabase.from("games").select("slug,title").eq("is_published", true)
+          .eq("slug", article.related_game_slug).maybeSingle()
+      : null,
+  ]);
+  const related = article.related_article_ids.flatMap((id) =>
+    relatedResult?.data?.filter((item) => item.id === id) ?? []
+  );
+  const game = gameResult?.data;
+
   const safeHtml = renderSafeArticleHtml(article.content || "");
   const defaultQuestion = /\p{Script=Arabic}/u.test(article.title)
     ? `شو بتحب تضيف على مقال «${article.title}»؟`
@@ -282,18 +300,21 @@ export default async function BlogPostPage({ params }: PageProps) {
               question={article.discussion_question?.trim() || defaultQuestion}
             />
 
-            <div className="mt-12 rounded-2xl border border-cyan-400/20 bg-cyan-500/[0.06] p-5 sm:p-6">
-              <h2 className="text-lg font-extrabold text-white">Discover games made by JUDE Game Studio</h2>
-              <p className="mt-2 text-sm leading-7 text-slate-300">
-                Explore JUDE Originals, including LAHZA, JUDOKU, and JUDE Space Shooter.
-              </p>
-              <Link
-                href="/jude-originals"
-                className="mt-4 inline-flex rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/20"
-              >
-                Explore JUDE Originals →
+            {game && (
+              <Link href={`/game/${encodeURIComponent(game.slug)}`} dir="auto"
+                className="mt-8 inline-flex rounded-xl border border-cyan-400/35 bg-cyan-400/10 px-5 py-3 text-sm font-bold text-cyan-200 hover:bg-cyan-400/20">
+                Play {game.title}
               </Link>
-            </div>
+            )}
+
+            {related.length > 0 && (
+              <section className="mt-10" aria-labelledby="related-articles">
+                <h2 id="related-articles" className="mb-4 text-2xl font-black">Read also</h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {related.map((item) => <ArticleCard key={item.id} article={item} />)}
+                </div>
+              </section>
+            )}
 
             <div className="mt-10 flex flex-wrap gap-3 border-t border-white/10 pt-7">
               <Link
