@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/app/lib/supabase";
 import ArticleEditor from "@/app/components/ArticleEditor";
+import ArticleCommentsAdmin from "./ArticleCommentsAdmin";
 
 const ADMIN_EMAIL = "mhd.khalifeh89@gmail.com";
 
@@ -22,6 +23,7 @@ type Article = {
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  discussion_question: string | null;
 };
 
 const emptyForm = {
@@ -34,6 +36,7 @@ const emptyForm = {
   seo_description: "",
   published: false,
   cover_image: "",
+  discussion_question: "",
 };
 
 function makeSlug(value: string) {
@@ -122,6 +125,7 @@ export default function ArticlesAdminPage() {
       seo_title: article.seo_title || "",
       seo_description: article.seo_description || "",
       published: article.published,
+      discussion_question: article.discussion_question || "",
       cover_image: article.cover_image || "",
     });
 
@@ -195,6 +199,7 @@ export default function ArticlesAdminPage() {
         seo_description:
           form.seo_description.trim() || form.excerpt.trim(),
         published: publish,
+        discussion_question: form.discussion_question.trim() || null,
         published_at: publish
           ? existingArticle?.published_at || new Date().toISOString()
           : null,
@@ -340,6 +345,8 @@ export default function ArticlesAdminPage() {
           </div>
         )}
 
+        <ArticleCommentsAdmin articles={articles} />
+
         <section className="rounded-3xl border border-white/10 bg-slate-950 p-6 md:p-8">
           <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-black">
@@ -446,6 +453,18 @@ export default function ArticlesAdminPage() {
               <ArticleEditor
                 value={form.content}
                 onChange={(html) => updateField("content", html)}
+              />
+              <label htmlFor="discussion-question" className="mt-5 block text-sm font-bold text-slate-300">
+                Discussion question (optional)
+              </label>
+              <input
+                id="discussion-question"
+                value={form.discussion_question}
+                onChange={(event) => updateField("discussion_question", event.target.value)}
+                maxLength={240}
+                dir="auto"
+                placeholder="Ask readers a question about this article"
+                className="mt-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 outline-none focus:border-fuchsia-500"
               />
 
               <p className="mt-3 text-xs text-slate-500">

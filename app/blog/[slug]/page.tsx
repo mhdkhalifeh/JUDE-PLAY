@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { createClient } from "@supabase/supabase-js";
 import sanitizeHtml from "sanitize-html";
+import ArticleEngagement from "./ArticleEngagement";
 
 export const revalidate = 60;
 
@@ -25,6 +26,7 @@ type Article = {
   seo_title: string | null;
   seo_description: string | null;
   published_at: string | null;
+  discussion_question: string | null;
 };
 
 type PageProps = {
@@ -35,7 +37,7 @@ async function getArticle(slug: string): Promise<Article | null> {
   const { data, error } = await supabase
     .from("articles")
     .select(
-      "id,title,slug,excerpt,content,cover_image,category,seo_title,seo_description,published_at"
+      "id,title,slug,excerpt,content,cover_image,category,seo_title,seo_description,published_at,discussion_question"
     )
     .eq("slug", slug)
     .eq("published", true)
@@ -184,6 +186,9 @@ export default async function BlogPostPage({ params }: PageProps) {
   if (!article) notFound();
 
   const safeHtml = renderSafeArticleHtml(article.content || "");
+  const defaultQuestion = /\p{Script=Arabic}/u.test(article.title)
+    ? `شو بتحب تضيف على مقال «${article.title}»؟`
+    : `What would you add to “${article.title}”?`;
   const dateLabel = formattedDate(article.published_at);
   const cover = absoluteHttpUrl(article.cover_image);
   const canonical = articleUrl(article.slug);
@@ -270,6 +275,12 @@ export default async function BlogPostPage({ params }: PageProps) {
             ) : (
               <p className="text-slate-400">Article content is not available yet.</p>
             )}
+
+            <ArticleEngagement
+              key={article.id}
+              articleId={article.id}
+              question={article.discussion_question?.trim() || defaultQuestion}
+            />
 
             <div className="mt-12 rounded-2xl border border-cyan-400/20 bg-cyan-500/[0.06] p-5 sm:p-6">
               <h2 className="text-lg font-extrabold text-white">Discover games made by JUDE Game Studio</h2>
