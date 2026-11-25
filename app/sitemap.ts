@@ -1,8 +1,7 @@
-
 import type { MetadataRoute } from "next";
 import { supabase } from "@/app/lib/supabase";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 const siteUrl = "https://www.jude-play.com";
 
